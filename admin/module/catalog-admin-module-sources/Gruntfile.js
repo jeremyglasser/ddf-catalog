@@ -23,6 +23,16 @@ module.exports = function (grunt) {
         clean: {
           build: ['target/webapp']
         },
+        less: {
+            css: {
+                options: {
+                    cleancss: true
+                },
+                files: {
+                    "src/main/webapp/css/styles.css":"src/main/webapp/less/styles.less"
+                }
+            }
+        },
         cssmin: {
             compress: {
                 files: {
@@ -69,9 +79,25 @@ module.exports = function (grunt) {
 //                    '<%= jshint.files %>'
                 ]
             },
+            lessFiles: {
+                files: ['src/main/webapp/less/*.less','src/main/webapp/less/**/*.less','src/main/webapp/less/***/*.less'],
+                tasks: ['less']
+            },
             cssFiles : {
                 files :['src/main/webapp/css/*.css'],
                 tasks : ['cssmin']
+            }
+        },
+        express: {
+            options: {
+                port: 8282,
+                hostname: '*'
+            },
+            
+            server: {
+                options: {
+                    server: './server.js'
+                }
             }
         }
     });
@@ -80,10 +106,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-express');
 
-    var buildTasks = ['clean', 'cssmin', 'jshint'];
+    var buildTasks = ['clean', 'less', 'cssmin'];
 
     grunt.registerTask('build', buildTasks);
-    grunt.registerTask('default', ['build', 'watch']);
+    grunt.registerTask('default', ['build','express', 'watch']);
 
 };
