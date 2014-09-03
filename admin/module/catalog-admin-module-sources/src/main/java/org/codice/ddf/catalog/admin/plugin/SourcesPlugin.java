@@ -27,9 +27,7 @@ public class SourcesPlugin extends AbstractApplicationPlugin {
 	 */
 	public SourcesPlugin() {
 		this.displayName = "Sources";
-        this.iframeLocation = URI.create("/sources/index.html");
-        List<String> apps = new ArrayList<String>();
-        apps.add("catalog-app");
-        this.setAssociations(apps);
+        this.javascriptLocation = "/applications/js/view/plugins/details/Plugin.view.js";
+		this.order = 0;
 	}
 }
