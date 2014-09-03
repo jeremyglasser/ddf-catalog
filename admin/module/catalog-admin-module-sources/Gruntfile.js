@@ -36,7 +36,7 @@ module.exports = function (grunt) {
         cssmin: {
             compress: {
                 files: {
-                    "target/webapp/css/style.css": ["src/main/webapp/css/*.css"]
+                    "target/webapp/css/style.css":"src/main/webapp/less/styles.less"
                 }
             }
         },
@@ -102,14 +102,13 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-express');
 
-    var buildTasks = ['clean', 'less', 'cssmin'];
+    var buildTasks = ['clean', 'less', 'jshint'];
 
     grunt.registerTask('build', buildTasks);
     grunt.registerTask('default', ['build','express', 'watch']);

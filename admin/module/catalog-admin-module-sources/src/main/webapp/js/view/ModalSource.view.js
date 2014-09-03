@@ -23,11 +23,12 @@ define([
         'js/view/Utils.js',
         'wreqr',
         'underscore',
+        'jquery',
         'text!templates/sourceModal.handlebars',
         'text!templates/optionListType.handlebars',
         'text!templates/textType.handlebars'
 ],
-function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource,optionListType,textType) {
+function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,$,modalSource,optionListType,textType) {
 
     ich.addTemplate('modalSource', modalSource);
     if (!ich.optionListType) {
@@ -136,7 +137,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
         getAllConfigs: function() {
             var configs = new Backbone.Collection();
             var disabledConfigs = this.model.get('disabledConfigurations');
-            var currentConfig = this.model.get('currentConfiguration')
+            var currentConfig = this.model.get('currentConfiguration');
             if (!_.isUndefined(currentConfig)) {
                 var currentService = currentConfig.get('service');
                 configs.add(currentService);
@@ -173,7 +174,6 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
         },
         checkName: function(newName) {
             var view = this;
-            var $group = view.$el.find('.sourceName>.control-group');
             var model = view.model;
             var config = model.get('currentConfiguration');
             var disConfigs = model.get('disabledConfigurations');
@@ -244,7 +244,6 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
             return valid;
         },
         fpidExists: function(model, fpid) {
-            var view = this;
             var modelConfig = model.get('currentConfiguration');
             var disabledConfigs = model.get('disabledConfigurations');
             var matchFound = false;
@@ -302,7 +301,8 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
             var model = this.model;
             var currentConfig = model.get('currentConfiguration');
             var disabledConfigs = model.get('disabledConfigurations');
-            var config = undefined;
+            var config;
+
             if (!_.isUndefined(currentConfig) && currentConfig.get('fpid') === id) {
                 config = currentConfig;
             } else {
@@ -319,7 +319,6 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
             return config;
         },
         renderDetails: function(configuration) {
-            var view = this;
             if (!_.isUndefined(configuration)) {
                 this.details.show(new ModalDetails.View({
                     model: configuration,

@@ -42,7 +42,7 @@ function (ich,Marionette,Backbone,_,Utils,textType,passwordType,numberType,check
          * Initialize  the binder with the ManagedServiceFactory model.
          * @param options
          */
-        initialize: function(options) {
+        initialize: function() {
             _.bindAll(this);
         },
         onRender: function() {
@@ -68,13 +68,12 @@ function (ich,Marionette,Backbone,_,Utils,textType,passwordType,numberType,check
             return val === 'id' || val === 'shortname';
         },
         renderNameField: function() {
+            var view = this;
             var idModel = view.model.get('metatype').find(function(each) {
                 return view.isIdField(each);
             });
             if (!_.isUndefined(idModel)) {
                 view.$el.append(ich.textType(idModel.toJSON()));
-            } else {
-                //unable to find name field
             }
         },
         /**

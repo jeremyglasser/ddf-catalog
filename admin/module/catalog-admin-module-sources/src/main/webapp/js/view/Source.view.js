@@ -17,6 +17,7 @@ define([
     'icanhaz',
     'marionette',
     'underscore',
+    'jquery',
     'js/view/ModalSource.view.js',
     'js/model/Service.js',
     'wreqr',
@@ -26,7 +27,7 @@ define([
     'text!templates/sourceList.handlebars',
     'text!templates/sourceRow.handlebars'
 ],
-function (ich,Marionette,_,ModalSource,Service,wreqr,deleteModal,deleteSource,sourcePage,sourceList,sourceRow) {
+function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,sourcePage,sourceList,sourceRow) {
 
     var SourceView = {};
 
@@ -114,9 +115,6 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,deleteModal,deleteSource,so
         template: 'sourceList',
         itemView: SourceView.SourceRow,
         itemViewContainer: 'tbody',
-        initialize: function() {
-            console.log('initialized source table');
-        }
     });
 
     SourceView.SourcePage = Marionette.Layout.extend({
@@ -163,9 +161,6 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,deleteModal,deleteSource,so
         removeSource: function() {
             var view = this;
             if(view.model) {
-//                this.sourcesModal.show(new SourceView.SourceTable({
-//                    model: view.model
-//                }));
 
                 this.sourcesModal.show(new SourceView.DeleteModal({
                     model: view.model,
@@ -187,18 +182,6 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,deleteModal,deleteSource,so
         }
     });
 
-//    SourceView.SourceRow = Marionette.Layout.extend({
-//        template: "sourceRow",
-//        tagName: "tr",
-//        className: "highlight-on-hover",
-//        regions: {
-//            editModal: '.modal-container'
-//        },
-//        SourceView.DeleteModal = Marionette.CompositeView.extend({
-//            template: 'sourceList',
-//            itemView: SourceView.SourceRow,
-//            itemViewContainer: 'tbody',
-//        });
     SourceView.DeleteItem = Marionette.ItemView.extend({
         template: "deleteSource",
         initalize: function() {
@@ -219,7 +202,6 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,deleteModal,deleteSource,so
         },
         deleteSources: function() {
             var sources = this.model.get('collection');
-//            sources.each();
             console.log('deleting sources...');
             this.$el.modal("hide");
         }

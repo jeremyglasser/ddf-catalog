@@ -16,7 +16,8 @@
 define(function (require) {
 
     var Backbone = require('backbone'),
-        $ = require('jquery');
+        $ = require('jquery'),
+        _ = require('underscore');
 
     require('backbonerelational');
 
@@ -95,11 +96,17 @@ define(function (require) {
                 }).then(function(){
                         // massage some data to match the new backend pid.
                         model.trigger('enabled');
+<<<<<<< HEAD
                         //enabling the model means the PID will be regenerated. This model no longer exists on the server.
                         model.destroy();
                         deferred.resolve();
                     }).fail(function(){
                         deffered.reject('Could not enable configuratoin ' + pid);
+=======
+                        deferred.resolve();
+                    }).fail(function(){
+                        deferred.reject('Could not enable configuratoin ' + pid);
+>>>>>>> DDF-804 - Adding the new SourcesPlugin for the catalog sources tab.
                     });
             } else {
                 deferred.fail("Cannot enable since this model has no pid.");
@@ -194,6 +201,9 @@ define(function (require) {
             return deferred;
         },
         createNewFromServer: function(deferred) {
+            var model = this,
+                addUrl = [model.configUrl, "add"].join("/");
+
             model.makeConfigCall(model).done(function (data) {
                 var collect = model.collectedData(JSON.parse(data).value);
                 var jData = JSON.stringify(collect);
