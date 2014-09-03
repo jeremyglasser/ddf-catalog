@@ -16,7 +16,8 @@
 define(function (require) {
 
     var Backbone = require('backbone'),
-        Service = require('js/model/Service.js');
+        Service = require('js/model/Service.js'),
+        _ = require('underscore');
 
     require('backbonerelational');
 
@@ -195,7 +196,7 @@ define(function (require) {
         isSourceConfiguration: function(configuration) {
             return (configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1);
         }
-    })
+    });
     return Source;
 
 });

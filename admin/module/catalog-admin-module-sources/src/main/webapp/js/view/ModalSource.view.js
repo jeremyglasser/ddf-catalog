@@ -137,7 +137,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         getAllConfigs: function() {
             var configs = new Backbone.Collection();
             var disabledConfigs = this.model.get('disabledConfigurations');
-            var currentConfig = this.model.get('currentConfiguration')
+            var currentConfig = this.model.get('currentConfiguration');
             if (!_.isUndefined(currentConfig)) {
                 var currentService = currentConfig.get('service');
                 configs.add(currentService);
@@ -174,7 +174,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         },
         checkName: function(newName) {
             var view = this;
-            var $group = view.$el.find('.sourceName>.control-group');
             var model = view.model;
             var config = model.get('currentConfiguration');
             var disConfigs = model.get('disabledConfigurations');
@@ -245,7 +244,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             return valid;
         },
         fpidExists: function(model, fpid) {
-            var view = this;
             var modelConfig = model.get('currentConfiguration');
             var disabledConfigs = model.get('disabledConfigurations');
             var matchFound = false;

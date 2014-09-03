@@ -16,7 +16,8 @@
 define(function (require) {
 
     var Backbone = require('backbone'),
-        $ = require('jquery');
+        $ = require('jquery'),
+        _ = require('underscore');
 
     require('backbonerelational');
 
@@ -100,6 +101,7 @@ define(function (require) {
                         deferred.resolve();
                     }).fail(function(){
                         deferred.reject(new Error('Could not enable configuratoin ' + pid));
+                        deferred.resolve();
                     });
             } else {
                 deferred.fail(new Error("Cannot enable since this model has no pid."));
@@ -194,6 +196,9 @@ define(function (require) {
             return deferred;
         },
         createNewFromServer: function(deferred) {
+            var model = this,
+                addUrl = [model.configUrl, "add"].join("/");
+
             model.makeConfigCall(model).done(function (data) {
                 var collect = model.collectedData(JSON.parse(data).value);
                 var jData = JSON.stringify(collect);
