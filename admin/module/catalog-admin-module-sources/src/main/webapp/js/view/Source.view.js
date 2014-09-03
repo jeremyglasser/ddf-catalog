@@ -58,6 +58,10 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,sourcePage,sourceList,sou
             this.$el.off('click');
         },
         editSource: function(evt) {
+            console.log($(evt.currentTarget).find('a').text());
+            if (evt.currentTarget === this.el) {
+                console.log('matches!!!');
+            }
             evt.stopPropagation();
             var model = this.model;
             wreqr.vent.trigger('editSource', model);

@@ -12,24 +12,16 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-/*global module,require*/
+
+/*global module*/
 
 module.exports = function (grunt) {
 
     grunt.initConfig({
-       
         pkg: grunt.file.readJSON('package.json'),
 
         clean: {
           build: ['target/webapp']
-        },
-        bower: {
-            install: {
-                options: {
-                    bowerOptions: {"--offline": true}
-                }
-
-            }
         },
         less: {
             css: {
@@ -37,7 +29,14 @@ module.exports = function (grunt) {
                     cleancss: true
                 },
                 files: {
-                    "target/webapp/css/style.css":"src/main/webapp/less/styles.less"
+                    "src/main/webapp/css/styles.css":"src/main/webapp/less/styles.less"
+                }
+            }
+        },
+        cssmin: {
+            compress: {
+                files: {
+                    "target/webapp/css/style.css": ["src/main/webapp/css/*.css"]
                 }
             }
         },
@@ -84,9 +83,9 @@ module.exports = function (grunt) {
                 files: ['src/main/webapp/less/*.less','src/main/webapp/less/**/*.less','src/main/webapp/less/***/*.less'],
                 tasks: ['less']
             },
-            bowerFile: {
-                files: ['src/main/webapp/bower.json'],
-                tasks: ['bower']
+            cssFiles : {
+                files :['src/main/webapp/css/*.css'],
+                tasks : ['cssmin']
             }
         },
         express: {
@@ -94,7 +93,7 @@ module.exports = function (grunt) {
                 port: 8282,
                 hostname: '*'
             },
-
+            
             server: {
                 options: {
                     server: './server.js'
@@ -103,49 +102,16 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-express');
 
-    var buildTasks = ['clean', 'bower-offline-install', 'less', 'jshint'];
+    var buildTasks = ['clean', 'less', 'cssmin'];
 
     grunt.registerTask('build', buildTasks);
     grunt.registerTask('default', ['build','express', 'watch']);
-
-    grunt.registerTask('bower-offline-install', 'Bower offline install work-around', function() {
-        var bower = require('bower');
-        var done = this.async();
-        grunt.log.writeln("Trying to install bower packages OFFline.");
-        bower.commands
-            .install([], {save: true}, { offline: true })
-            .on('data', function(data){
-                grunt.log.write(data);
-            })
-            .on('error', function(data){
-                grunt.log.writeln(data);
-                grunt.log.writeln("Trying to install bower packages ONline.");
-                bower.commands
-                    .install()
-                    .on('data', function(data){
-                        grunt.log.write(data);
-                    })
-                    .on('error', function(data){
-                        grunt.log.write(data);
-                        done(false);
-                    })
-                    .on('end', function () {
-                        grunt.log.write("Bower installed online.");
-                        done();
-                    });
-            })
-            .on('end', function () {
-
-                grunt.log.writeln("Bower installed offline.");
-                done();
-            });
-    });
 
 };

@@ -98,10 +98,10 @@ define(function (require) {
                         model.trigger('enabled');
                         deferred.resolve();
                     }).fail(function(){
-                        deferred.reject(new Error('Could not enable configuratoin ' + pid));
+                        deferred.reject('Could not enable configuratoin ' + pid);
                     });
             } else {
-                deferred.fail(new Error("Cannot enable since this model has no pid."));
+                deferred.fail("Cannot enable since this model has no pid.");
             }
 
             return deferred;
@@ -240,6 +240,7 @@ define(function (require) {
             this.set('fpid', fpid);
             this.set('name', name);
             this.get('properties').set('service.factoryPid', fpid);
+            console.log('initialized from service.');
         },
         initializeFromMetatype: function(metatype) {
             var model = this;
@@ -251,10 +252,12 @@ define(function (require) {
                 model.set('properties', 
                         Service.Properties.findOrCreate(idModel.get('defaultValue')));
             }
+            console.log(model.get('properties'));
             metatype.forEach(function(obj){
                 var id = obj.get('id');
                 var val = obj.get('defaultValue');
                 if (id !== 'id') {
+                    console.log('setting ' + id + ":" + val);
                     model.get('properties').set(id, (val) ? val.toString() : null);
                 }
             });

@@ -18,7 +18,7 @@ define([
         'icanhaz',
         'marionette',
         'backbone',
-        'js/view/ConfigurationEdit.view.js',
+        'js/view/ModalSourceDetails.js',
         'js/model/Service.js',
         'js/view/Utils.js',
         'wreqr',
@@ -28,7 +28,7 @@ define([
         'text!templates/optionListType.handlebars',
         'text!templates/textType.handlebars'
 ],
-function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,modalSource,optionListType,textType) {
+function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,$,modalSource,optionListType,textType) {
 
     ich.addTemplate('modalSource', modalSource);
     if (!ich.optionListType) {
@@ -97,6 +97,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             model.set('name', initialName);
             $sourceName.append(ich.textType(data));
             $sourceName.val(data.defaultValue);
+            console.log(data.defaultValue);
             Utils.setupPopOvers($sourceName, data.id, data.name, data.description);
         },
         /**
@@ -260,7 +261,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
 
                 var properties = config.get('properties');
                 view.checkName(view.$('.sourceName').find('input').val().trim());
-                view.renderDetails(config, config.get('service'));
+                view.renderDetails(config.get('service'));
                 view.modelBinder.bind(properties, $boundData,
                       Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
@@ -286,14 +287,16 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             }
             return config;
         },
-        renderDetails: function(model, configuration) {
-            var toDisplay = configuration.get('metatype').filter(function(mt) {
-                return !_.contains(['shortname', 'id', 'parameters'], mt.get('id'));
-            });
-            this.details.show(new ConfigurationEdit.ConfigurationCollection({
-                collection: new Service.MetatypeList(toDisplay),
-                service: configuration,
-                configuration: this.model}));
+        renderDetails: function(configuration) {
+            if (!_.isUndefined(configuration)) {
+                this.details.show(new ModalDetails.View({
+                    model: configuration,
+                    id: configuration.get('id')
+                }));
+            } else {
+                $(this.details.el).html('');
+                $(this.buttons.el).html('');
+            }
         }
     });
 
