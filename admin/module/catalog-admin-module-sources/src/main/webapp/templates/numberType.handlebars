@@ -11,20 +11,14 @@
  *
  **/
  --}}
-<div class='{{id}} metatype control-group row vpad'>
-    <div class="col-md-4">
-        <label class='control-label' for='{{id}}'>{{name}}</label>
-    </div>
+<div class='{{id}} metatype control-group'>
+    <label class='control-label' for='{{id}}'>{{name}}</label>
     <div class='controls'>
-        <div class="col-md-7">
-            <input type='number' class='{{id}} metatype form-control input-sm' name='{{id}}' id='{{id}}' value='{{#defaultValue}}{{.}}{{/defaultValue}}'>
-        </div>
-        <div class="col-md-1">
-            {{#if description}}
-                <a href='#' class='description' data-title='{{id}}'>
-                    <i class='glyphicon glyphicon-question-sign'></i>
-                </a>
-            {{/if}}
-        </div>
+        <input type='number' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{#defaultValue}}{{.}}{{/defaultValue}}'>
+        {{#if description}}
+            <a href='#' class='description' data-title='{{id}}'>
+                <i class='glyphicon glyphicon-question-sign'></i>
+            </a>
+        {{/if}}
     </div>
 </div>
