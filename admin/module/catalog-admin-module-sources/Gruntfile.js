@@ -100,20 +100,19 @@ module.exports = function (grunt) {
                     server: './server.js'
                 }
             }
-        }
+        },
     });
 
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-express');
 
     var buildTasks = ['clean', 'bower-offline-install', 'less', 'jshint'];
 
     grunt.registerTask('build', buildTasks);
-    grunt.registerTask('default', ['build','express', 'watch']);
+    grunt.registerTask('default', ['build', 'watch']);
 
     grunt.registerTask('bower-offline-install', 'Bower offline install work-around', function() {
         var bower = require('bower');
