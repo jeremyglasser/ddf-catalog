@@ -24,11 +24,49 @@
             'js/application',
             '../admin/js/HandlebarsHelpers',
             'modelbinder',
-            'bootstrap'
+            'bootstrap',
+            '../admin/templateConfig'
+
         ], function ($, Backbone, Marionette, ich, Application) {
 
         	
         	var app = Application.App;
+            
+            //setup the area that the modules will load into and asynchronously require in each module
+            //so that it can render itself into the area that was just constructed for it
+//            app.addInitializer(function() {
+//            	var Service = require('/sources/js/model/Service.js');
+//                var serviceModel = new Service.Response();
+//                serviceModel.fetch();
+//                
+//                var sourceResponse = new Source.Response({model: serviceModel});
+//                var sourcePage = new ModuleView.SourcePage({model: sourceResponse});
+//                Application.App.mainRegion.show(new ModuleView({model: Application.ModuleModel}));
+//            });
+
+            //setup the header
+//            app.addInitializer(function() {
+//                Application.App.headerRegion.show(new Marionette.ItemView({
+//                    template: 'headerLayout',
+//                    className: 'header-layout',
+//                    model: Application.AppModel
+//                }));
+//            });
+
+            //setup the footer
+//            app.addInitializer(function() {
+//                Application.App.footerRegion.show(new Marionette.ItemView({
+//                    template: 'footerLayout',
+//                    className: 'footer-layout',
+//                    model: Application.AppModel
+//                }));
+//            });
+
+            // Start up the main Application Router
+//            app.addInitializer(function() {
+//                app.router = new Application.Router();
+//            });
+
             // Once the application has been initialized (i.e. all initializers have completed), start up
             // Backbone.history.
             app.on('initialize:after', function() {
