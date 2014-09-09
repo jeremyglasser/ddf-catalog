@@ -15,19 +15,17 @@
 /*global define*/
 define(function (require) {
 
-	
     var ich = require('icanhaz'),
         Marionette = require('marionette'),
-        SourceEdit = require('js/view/SourceEdit.view.js'),
-        Service = require('js/model/Service.js');
+        SourceEdit = require('/sources/js/views/SourceEdit.view.js');
 
     var SourceView = {};
 
-	ich.addTemplate('sourcePage', require('text!templates/sourcePage.handlebars'));
-	ich.addTemplate('sourceList', require('text!templates/sourceList.handlebars'));
-	ich.addTemplate('sourceRow', require('text!templates/sourceRow.handlebars'));
+    ich.addTemplate('sourcePage', require('text!/sources/templates/sourcePage.handlebars'));
+    ich.addTemplate('sourceList', require('text!/sources/templates/listSource.handlebars'));
+    ich.addTemplate('sourceRow', require('text!/sources/templates/sourceRow.handlebars'));
 
-	SourceView.SourceRow = Marionette.Layout.extend({
+    SourceView.SourceRow = Marionette.Layout.extend({
         template: "sourceRow",
         tagName: "tr",
         events: {
@@ -48,10 +46,8 @@ define(function (require) {
         onRender: function() {
             this.editModal.show(new SourceEdit.View({model: this.model, id: this.model.get('currentConfiguration').get('id')}));
         },
-        editSource: function(evt) {
-            evt.stopPropagation();
-            var model = this.model;
-            wreqr.vent.trigger('editSource', model);
+        editSource: function() {
+            this.editModal.currentView.$el.modal();
         }
     });
 
