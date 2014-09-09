@@ -16,8 +16,7 @@
 define(function (require) {
 
     var Backbone = require('backbone'),
-        Service = require('js/model/Service.js'),
-        _ = require('underscore');
+        Service = require('/sources/js/model/Service.js');
 
     require('backbonerelational');
 
@@ -95,6 +94,7 @@ define(function (require) {
                 }
             } else {
                 source = new Source.Model();
+//                this.listenTo(source, 'removeSource', this.removeSource);
                 this.sourceMap[configuration.get("id")] = source;
                 if(enabled) {
                     source.setCurrentConfiguration(configuration);
@@ -109,10 +109,6 @@ define(function (require) {
             this.stopListening(source);
             this.remove(source);
             delete this.sourceMap[source.get('currentConfiguration').get('id')];
-        },
-        comparator: function(model){
-            var id = model.get('currentConfiguration').id.replace('_disabled','');  // scrub the label of the _disable
-            return id;
         }
     });
 
@@ -131,50 +127,25 @@ define(function (require) {
                 this.model.get("value").each(function(service) {
                     if(!_.isEmpty(service.get("configurations"))) {
                         service.get("configurations").each(function(configuration) {
-                            if(configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1){
+                            if(configuration.get("id")) {
+                            	console.log('adding ' + configuration.get("id"));
                                 resModel.get("collection").addSource(configuration, true);
+                            }
+                        });
+                    }
+                    if(!_.isEmpty(service.get("disabledConfigurations"))) {
+                        service.get("disabledConfigurations").each(function(configuration) {
+                        	console.log(configuration)
+                        	if(configuration.get("id")) {
+                                resModel.get("collection").addSource(configuration, false);
                             }
                         });
                     }
                 });
             }
-        },
-        getSourceMetatypes: function() {
-            var resModel = this;
-            var metatypes = [];
-            if(resModel.model.get('value')) {
-                resModel.model.get('value').each(function(service) {
-                var id = service.get('id');
-                var name = service.get('name');
-                if (!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) {
-                    metatypes.push(service);
-                }
-                });
-            }
-            return metatypes;
-        },
-        getSourceModelWithServices: function() {
-            var resModel = this;
-            var serviceCollection = resModel.model.get('value');
-            var retModel = new Source.Model();
-            
-            if(serviceCollection) {
-                serviceCollection.each(function(service) {
-                    var id = service.get('id');
-                    var name = service.get('name');
-                    if (!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) {
-                        var config = new Service.Configuration();
-                        config.initializeFromService(service);
-                        retModel.addDisabledConfiguration(config);
-                    }
-                });
-            }
-            return retModel;
-        },
-        isSourceConfiguration: function(configuration) {
-            return (configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1);
         }
     });
+
     return Source;
 
 });
