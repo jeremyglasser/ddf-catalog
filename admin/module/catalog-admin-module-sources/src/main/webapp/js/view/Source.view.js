@@ -16,14 +16,14 @@
 define([
     'icanhaz',
     'marionette',
-    'js/view/SourceEdit.view.js',
+    'js/view/ModalSource.view.js',
     'js/model/Service.js',
     'wreqr',
     'text!templates/sourcePage.handlebars',
     'text!templates/sourceList.handlebars',
     'text!templates/sourceRow.handlebars',
 ],
-function (ich,Marionette,SourceEdit,Service,wreqr,sourcePage,sourceList,sourceRow) {
+function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceRow) {
 
     var SourceView = {};
 
@@ -54,7 +54,7 @@ function (ich,Marionette,SourceEdit,Service,wreqr,sourcePage,sourceList,sourceRo
         },
         onRender: function() {
             if (this.model && this.model.has('currentConfiguration')) {
-                this.editModal.show(new SourceEdit.View({model: this.model, id: this.model.get('currentConfiguration').get('id')}));
+                this.editModal.show(new ModalSource.View({model: this.model, id: this.model.get('currentConfiguration').get('id')}));
             }
         },
         editSource: function() {

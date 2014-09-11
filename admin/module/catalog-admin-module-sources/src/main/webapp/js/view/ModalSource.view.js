@@ -19,7 +19,6 @@ define(function (require) {
     var Backbone = require('backbone'),
         Marionette = require('marionette'),
         ModalDetails = require('js/view/ModalSourceDetails.js'),
-        SourceEdit = require('js/view/SourceEdit.view.js'),
         _ = require('underscore'),
         ich = require('icanhaz');
 
@@ -71,22 +70,21 @@ define(function (require) {
         renderTypeDropdown: function() {
             var collection = this.model.get('collection');
             var configs = new Backbone.Collection();
-            _.each(collection.models, function(item) {
-                //if this doesn't have an fpid it isn't a managed service factory
-                //if it isn't a managed service factory then we can't select anything in the drop down
-                var current = item.get('currentConfiguration');
-//                if(current.get("fpid")) {
+            if (_.isEmpty(collection)) {
+                configs.add(this.model.get('currentConfiguration'));
+            } else {
+                _.each(collection.models, function(item) {
+                    //if this doesn't have an fpid it isn't a managed service factory
+                    //if it isn't a managed service factory then we can't select anything in the drop down
+                    var current = item.get('currentConfiguration');
                     configs.add(current);
-//                }
-            });
-            
-            var $sourceTypeSelect = this.$(".sourceTypesSelect");
-            $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
-            if (!_.isEmpty(configs)) {
-                var selectedId = collection.at(0).get("fpid");
-                $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
-//                $sourceTypeSelect.val(selectedId);
-//                $sourceTypeSelect.trigger('change', $sourceTypeSelect);
+                });
+                var $sourceTypeSelect = this.$(".sourceTypesSelect");
+                $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
+                if (!_.isEmpty(configs)) {
+                    var selectedId = collection.at(0).get("fpid");
+                    $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+                }
             }
         },
 
