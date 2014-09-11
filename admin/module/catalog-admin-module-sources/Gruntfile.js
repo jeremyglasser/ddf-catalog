@@ -112,7 +112,7 @@ module.exports = function (grunt) {
     var buildTasks = ['clean', 'bower-offline-install', 'less', 'jshint'];
 
     grunt.registerTask('build', buildTasks);
-    grunt.registerTask('default', ['build', 'watch']);
+    grunt.registerTask('default', ['build','express', 'watch']);
 
     grunt.registerTask('bower-offline-install', 'Bower offline install work-around', function() {
         var bower = require('bower');

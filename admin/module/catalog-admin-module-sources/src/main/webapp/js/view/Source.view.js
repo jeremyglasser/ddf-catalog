@@ -13,41 +13,49 @@
  *
  **/
 /*global define*/
-define(function (require) {
-
-	
-    var ich = require('icanhaz'),
-        Marionette = require('marionette'),
-        SourceEdit = require('js/view/SourceEdit.view.js'),
-        ModalSource = require('js/view/ModalSource.view.js'),
-        Service = require('js/model/Service.js');
+define([
+    'icanhaz',
+    'marionette',
+    'js/view/SourceEdit.view.js',
+    'js/model/Service.js',
+    'wreqr',
+    'text!templates/sourcePage.handlebars',
+    'text!templates/sourceList.handlebars',
+    'text!templates/sourceRow.handlebars',
+],
+function (ich,Marionette,SourceEdit,Service,wreqr,sourcePage,sourceList,sourceRow) {
 
     var SourceView = {};
 
-	ich.addTemplate('sourcePage', require('text!templates/sourcePage.handlebars'));
-	ich.addTemplate('sourceList', require('text!templates/sourceList.handlebars'));
-	ich.addTemplate('sourceRow', require('text!templates/sourceRow.handlebars'));
+	ich.addTemplate('sourcePage', sourcePage);
+	ich.addTemplate('sourceList', sourceList);
+	ich.addTemplate('sourceRow', sourceRow);
 
 	SourceView.SourceRow = Marionette.Layout.extend({
         template: "sourceRow",
         tagName: "tr",
         events: {
-            'click .editLink': 'editSource'
+            'click .editLink': 'editSource',
+            'click .enable-button':'enableSource',
+            'click .disable-button':'disableSource'
         },
         regions: {
-            editModal: '.modal-container'
+            editModal: '.modal-container',
+            details: 'details'
         },
         serializeData: function(){
             var data = {};
 
-            if (this.model) {
+            if (this.model && this.model.has('currentConfiguration')) {
               data = this.model.get('currentConfiguration').toJSON();
             }
 
             return data;
         },
         onRender: function() {
-            this.editModal.show(new SourceEdit.View({model: this.model, id: this.model.get('currentConfiguration').get('id')}));
+            if (this.model && this.model.has('currentConfiguration')) {
+                this.editModal.show(new SourceEdit.View({model: this.model, id: this.model.get('currentConfiguration').get('id')}));
+            }
         },
         editSource: function(evt) {
             evt.stopPropagation();
@@ -68,6 +76,9 @@ define(function (require) {
             'click .refreshButton' : 'refreshSources',
             'click .addSourceLink' : 'addSource'
         },
+        initialize: function(){
+            this.listenTo(wreqr.vent, 'refreshSources', this.refreshSources);
+        },
         regions: {
             collectionRegion: '#sourcesRegion',
             sourcesModal: '#sources-modal'
@@ -76,7 +87,14 @@ define(function (require) {
             this.collectionRegion.show(new SourceView.SourceTable({ collection: this.model.get("collection") }));
         },
         refreshSources: function() {
-            this.model.fetch();
+            var view = this;
+            view.model.get('model').fetch({
+                success: function(){
+                    view.model.get('collection').sort();
+                    view.model.get('collection').trigger('reset');
+                    view.onRender();
+                }
+            });
         },
         addSource: function() {
             var model = this.model;

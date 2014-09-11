@@ -16,8 +16,7 @@
 define(function (require) {
 
     var Backbone = require('backbone'),
-        $ = require('jquery'),
-        _ = require('underscore');
+        $ = require('jquery');
 
     require('backbonerelational');
 
@@ -34,11 +33,6 @@ define(function (require) {
     Service.Configuration = Backbone.RelationalModel.extend({
         configUrl: "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0",
 
-        
-        defaults: {
-            properties: new Service.Properties()
-        },
-        
         relations: [
             {
                 type: Backbone.HasOne,
@@ -93,8 +87,8 @@ define(function (require) {
                 $.ajax({
                     url: url,
                     dataType: 'json'
-                }).then(function(){
-                        // massage some data to match the new backend pid.
+                }).then(function(respJson){
+                        // masashe some data to match the new backend pid.
                         model.trigger('enabled');
                         deferred.resolve();
                     }).fail(function(){
@@ -105,7 +99,6 @@ define(function (require) {
             }
 
             return deferred;
-
         },
 
         makeDisableCall: function(){
@@ -117,11 +110,11 @@ define(function (require) {
                 $.ajax({
                     url: url,
                     dataType: 'json'
-                }).then(function(){
+                }).then(function(respJson){
                         model.trigger('disabled');
                         deferred.resolve();
                     }).fail(function(){
-                        deferred.reject(new Error('Could not disable configuratoin ' + pid));
+                        deffered.reject(new Error('Could not disable configuratoin ' + pid));
                     });
             } else {
                 deferred.reject(new Error("Cannot enable since this model has no pid."));
@@ -180,37 +173,15 @@ define(function (require) {
                         data: jData,
                         url: addUrl
                     }).done(function (result) {
-                        deferred.resolve(result);
-                    }).fail(function (error) {
+                            deferred.resolve(result);
+                        }).fail(function (error) {
+                            deferred.fail(error);
+                        });
+                }).fail(function (error) {
                         deferred.fail(error);
                     });
-                }).fail(function (error) {
-                    deferred.fail(error);
-                });
             }
             return deferred;
-        },
-        createNewFromServer: function(deferred) {
-            var model = this,
-                addUrl = [model.configUrl, "add"].join("/");
-
-            model.makeConfigCall(model).done(function (data) {
-                var collect = model.collectedData(JSON.parse(data).value);
-                var jData = JSON.stringify(collect);
-
-                return $.ajax({
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: jData,
-                    url: addUrl
-                }).done(function (result) {
-                    deferred.resolve(result);
-                }).fail(function (error) {
-                    deferred.fail(error);
-                });
-            }).fail(function (error) {
-                deferred.fail(error);
-            });
         },
         destroy: function() {
             var deferred = $.Deferred(),
@@ -291,7 +262,10 @@ define(function (require) {
                 key: 'metatype',
                 relatedModel: Service.Metatype,
                 collectionType: Service.MetatypeList,
-                includeInJSON: false
+                includeInJSON: false,
+                reverseRelation: {
+                    key: 'service'
+                }
             }
         ],
 
