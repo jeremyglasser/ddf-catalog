@@ -30,32 +30,30 @@ define([
 ],
 function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,modalSource,optionListType,textType) {
 
-    ich.addTemplate('modalSource', modalSource);
-    if (!ich.optionListType) {
-        ich.addTemplate('optionListType', optionListType);
-    }
-    if (!ich.textType) {
-        ich.addTemplate('textType', textType);
+    ich.addTemplate('modalSource', require('text!templates/sourceModal.handlebars'));
+    //these templates are part of the admin ui and we expect them to be there
+    if(!ich.optionListType) {
+        ich.addTemplate('optionListType', require('text!templates/optionListType.handlebars'));
     }
 
     var ModalSource = {};
 
     ModalSource.View = Marionette.Layout.extend({
         template: 'modalSource',
+        tagName: 'div',
         className: 'modal',
+        configurations: null,
         /**
          * Button events, right now there's a submit button
          * I do not know where to go with the cancel button.
          */
         events: {
-            "change .sourceTypesSelect" : "handleTypeChange",
+            "change .sourceTypesSelect" : "renderDetails",
             "click .submit-button": "submitData",
-            "click .cancel-button": "cancel",
-            "change .sourceName": "sourceNameChanged"
+            "click .cancel-button": "cancel"
         },
         regions: {
-            details: '.modal-details',
-            buttons: '.source-buttons'
+            details: '.modal-details'
         },
 
         /**
@@ -64,16 +62,13 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          */
         initialize: function(options) {
             _.bindAll(this);
-            this.parentModel = options.parentModel;
+            this.configurations = options.configurations;
             this.modelBinder = new Backbone.ModelBinder();
         },
         onRender: function() {
-            var $boundData = this.$el.find('.bound-controls');
-            var currentConfig = this.model.get('currentConfiguration');
-
+            this.$el.attr('tabindex', "-1");
             this.$el.attr('role', "dialog");
             this.$el.attr('aria-hidden', "true");
-            this.renderNameField();
             this.renderTypeDropdown();
             if (!_.isNull(this.model) && !_.isUndefined(currentConfig)) {
                 this.modelBinder.bind(currentConfig.get('properties'),
@@ -103,142 +98,32 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Renders the type dropdown box
          */
         renderTypeDropdown: function() {
-            var $sourceTypeSelect = this.$(".sourceTypesSelect");
-            var configs = this.getAllConfigs();
-            $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
-            $sourceTypeSelect.val(configs.at(0).get('id')).change();
-        },
-        getAllConfigs: function() {
+            var collection = this.model.get('collection');
             var configs = new Backbone.Collection();
-            var disabledConfigs = this.model.get('disabledConfigurations');
-            var currentConfig = this.model.get('currentConfiguration');
-            if (!_.isUndefined(currentConfig)) {
-                var currentService = currentConfig.get('service');
-                configs.add(currentService);
+            _.each(collection.models, function(item) {
+                //if this doesn't have an fpid it isn't a managed service factory
+                //if it isn't a managed service factory then we can't select anything in the drop down
+                var current = item.get('currentConfiguration');
+//                if(current.get("fpid")) {
+                    configs.add(current);
+//                }
+            });
+            
+            var $sourceTypeSelect = this.$(".sourceTypesSelect");
+            $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
+            if (!_.isEmpty(configs)) {
+                var selectedId = collection.at(0).get("fpid");
+                $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+//                $sourceTypeSelect.val(selectedId);
+//                $sourceTypeSelect.trigger('change', $sourceTypeSelect);
             }
-            if (!_.isUndefined(disabledConfigs)) {
-                disabledConfigs.each(function(config) {
-                    configs.add(config.get('service'));
-                });
-            }
-            return configs;
         },
+
         /**
          * Submit to the backend.
          */
         submitData: function() {
-            var model = this.model.get('editConfig');
-            var parentModel = this.parentModel;
-            if (model) {
-                model.save();
-                if(model.get('enabled')) {
-                    parentModel.get('collection').each(function(config) {
-                        if (config.get('name') === model.get('name')) {
-                            config.set('enabled', false);
-                            config.save(); //TODO these saves need to happen atomically
-                        }
-                    });
-                }
-            }
-            this.closeAndUnbind();
-        },
-        sourceNameChanged: function(evt) {
-            var newName = $(evt.currentTarget).find('input').val().trim();
-            this.checkName(newName);
-        },
-        checkName: function(newName) {
-            var view = this;
-            var model = view.model;
-            var config = model.get('currentConfiguration');
-            var disConfigs = model.get('disabledConfigurations');
-
-            if (newName === '') {
-                view.showError('A configuration must have a name.');
-            } else if (newName !== model.get('name')) {
-                if (view.nameIsValid(newName, model.get('editConfig').get('fpid'))) {
-                    this.setConfigName(config, newName);
-                    if (!_.isUndefined(disConfigs)) {
-                        disConfigs.each(function(cfg) {
-                            view.setConfigName(cfg, newName);
-                        });
-                    }
-                    view.clearError();
-                } else {
-                    view.showError('A configuration with the name "' + newName + '" already exists. Please choose another name.');
-                }
-            } else {
-                //model name was reverted back to original value
-                view.clearError();
-            }
-        },
-        showError: function(msg) {
-            var view = this;
-            var $group = view.$el.find('.sourceName>.control-group');
-
-            $group.find('.error-text').text(msg).show();
-            view.$el.find('.submit-button').attr('disabled','disabled');
-            $group.addClass('has-error');
-        },
-        clearError: function() {
-            var view = this;
-            var $group = view.$el.find('.sourceName>.control-group');
-            var $error = $group.find('.error-text');
-
-            view.$el.find('.submit-button').removeAttr('disabled');
-            $group.removeClass('has-error');
-            $error.hide();
-        },
-        setConfigName: function(config, name) {
-            if (!_.isUndefined(config)) {
-                var properties =  config.get('properties');
-                properties.set('shortname', name);
-            }
-        },
-        /**
-         * Returns true if any of the existing source configurations have a name matching the one provided and false otherwise.
-         */
-        nameExists: function(name) {
-            var configs = this.parentModel.get('collection');
-            var match = configs.find(function(sourceConfig) {
-                    return sourceConfig.get('name') === name;
-                }); 
-            return !_.isUndefined(match);
-        },
-        nameIsValid: function(name, fpid) {
-            var valid = false;
-            var configs = this.parentModel.get('collection');
-            var match = configs.find(function(sourceConfig) {
-                return sourceConfig.get('name') === name;
-            });
-            if (_.isUndefined(match)) {
-                valid = true;
-            } else {
-                valid = !this.fpidExists(match, fpid);
-            }
-            return valid;
-        },
-        fpidExists: function(model, fpid) {
-            var modelConfig = model.get('currentConfiguration');
-            var disabledConfigs = model.get('disabledConfigurations');
-            var matchFound = false;
-
-            if (!_.isUndefined(modelConfig) && modelConfig.get('fpid') === fpid) {
-                matchFound = true;
-            } else if (!_.isUndefined(disabledConfigs)) {
-                matchFound = !_.isUndefined(disabledConfigs.find(function(modelConfig) {
-                    return modelConfig.get('fpid') === fpid;
-                }));
-            }
-            return matchFound;
-        },
-        //should be able to remove this method when the 'shortname' is removed from existing source metatypes
-        getId: function(config) {
-            var properties = config.get('properties');
-            return properties.get('shortname') || properties.get('id');
-        },
-        closeAndUnbind: function() {
-            this.modelBinder.unbind();
-            this.$el.modal("hide");
+            this.model.get('currentConfiguration').save();
         },
         /**
          * unbind the model and dom during close.
@@ -247,11 +132,10 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             this.modelBinder.unbind();
         },
         cancel: function() {
-            this.closeAndUnbind();
+            //TODO discard changes somehow
         },
-        handleTypeChange: function(evt) {
-            var view = this;
-            var $boundData = view.$el.find('.bound-controls');
+        renderDetails: function(evt) {
+            var collection = this.model.get('collection');
             var $select = $(evt.currentTarget);
             if ($select.hasClass('sourceTypesSelect')) {
                 this.modelBinder.unbind();
@@ -294,6 +178,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                 collection: new Service.MetatypeList(toDisplay),
                 service: configuration,
                 configuration: this.model}));
+
         }
     });
 
