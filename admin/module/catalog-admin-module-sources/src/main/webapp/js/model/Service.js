@@ -87,7 +87,7 @@ define(function (require) {
                 $.ajax({
                     url: url,
                     dataType: 'json'
-                }).then(function(respJson){
+                }).then(function(){
                         // masashe some data to match the new backend pid.
                         model.trigger('enabled');
                         deferred.resolve();
@@ -110,7 +110,7 @@ define(function (require) {
                 $.ajax({
                     url: url,
                     dataType: 'json'
-                }).then(function(respJson){
+                }).then(function(){
                         model.trigger('disabled');
                         deferred.resolve();
                     }).fail(function(){
@@ -262,10 +262,7 @@ define(function (require) {
                 key: 'metatype',
                 relatedModel: Service.Metatype,
                 collectionType: Service.MetatypeList,
-                includeInJSON: false,
-                reverseRelation: {
-                    key: 'service'
-                }
+                includeInJSON: false
             }
         ],
 
