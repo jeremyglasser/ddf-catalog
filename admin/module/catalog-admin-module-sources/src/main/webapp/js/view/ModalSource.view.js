@@ -112,12 +112,8 @@ define(function (require) {
             var view = this;
             var collection = view.metatypes; //view.model.get('collection');
             var $select = $(evt.currentTarget);
-            console.log(view.cid);
-            console.log(view.model);
             if ($select.hasClass('sourceTypesSelect')) {
                 var detailsModel = _.find(collection, function(item) {
-                    console.log(item.get('id'));
-                    console.log($select.val());
                     return item.get('id') === $select.val();
                 });
                 this.renderDetails(detailsModel);
