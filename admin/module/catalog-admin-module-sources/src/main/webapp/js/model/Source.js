@@ -152,8 +152,6 @@ define(function (require) {
                 }
                 });
             }
-
-            console.log(metatypes);
             return metatypes;
         },
         isSourceConfiguration: function(configuration) {

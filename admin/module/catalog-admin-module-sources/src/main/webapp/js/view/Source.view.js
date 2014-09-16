@@ -67,9 +67,6 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
         template: 'sourceList',
         itemView: SourceView.SourceRow,
         itemViewContainer: 'tbody', 
-        initialize: function() {
-            console.log('table initialized');
-        }
     });
 
     SourceView.SourcePage = Marionette.Layout.extend({
@@ -100,8 +97,6 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
             });
         },
         editSource: function(metatype) {
-            console.log('editSource triggered');
-            console.log(metatype);
             var metatypes = [];
             metatypes.push(metatype);
             this.sourcesModal.show(new ModalSource.View(
@@ -113,14 +108,9 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
         },
         addSource: function() {
             var model = this.model;
-            console.log(this.model);
             if(model) {
                 //var configs = Service.ConfigurationList;
                 //var configuration = new Service.Configuration();
-                model.get('collection').each(function(model) { 
-                    console.log(model.get('currentConfiguration').get('name')); 
-                });
-
                 this.sourcesModal.show(new ModalSource.View(
                     {
                         metatypes: this.model.getSourceMetatypes()
