@@ -54,11 +54,10 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
         },
         onRender: function() {
             if (this.model && this.model.has('currentConfiguration')) {
-                this.editModal.show(new ModalSource.View({model: this.model, id: this.model.get('currentConfiguration').get('id')}));
             }
         },
         editSource: function() {
-            this.editModal.currentView.$el.modal();
+            wreqr.vent.trigger('editSource', this.model);
         },
         enableSource: function(){
             var view = this;
@@ -79,7 +78,10 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
     SourceView.SourceTable = Marionette.CompositeView.extend({
         template: 'sourceList',
         itemView: SourceView.SourceRow,
-        itemViewContainer: 'tbody'
+        itemViewContainer: 'tbody', 
+        initialize: function() {
+            console.log('table initialized');
+        }
     });
 
     SourceView.SourcePage = Marionette.Layout.extend({
@@ -89,6 +91,7 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
             'click .addSourceLink' : 'addSource'
         },
         initialize: function(){
+            this.listenTo(wreqr.vent, 'editSource', this.editSource);
             this.listenTo(wreqr.vent, 'refreshSources', this.refreshSources);
         },
         regions: {
@@ -96,7 +99,7 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
             sourcesModal: '#sources-modal'
         },
         onRender: function() {
-            this.collectionRegion.show(new SourceView.SourceTable({ collection: this.model.get("collection") }));
+            this.collectionRegion.show(new SourceView.SourceTable({ model: this.model, collection: this.model.get("collection") }));
         },
         refreshSources: function() {
             var view = this;
@@ -108,23 +111,34 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
                 }
             });
         },
+        editSource: function(metatype) {
+            console.log('editSource triggered');
+            console.log(metatype);
+            var metatypes = [];
+            metatypes.push(metatype);
+            this.sourcesModal.show(new ModalSource.View(
+                {
+                    metatypes: metatypes
+                })
+            );
+            this.sourcesModal.currentView.$el.modal();
+        },
         addSource: function() {
             var model = this.model;
+            console.log(this.model);
             if(model) {
-                var configs = Service.ConfigurationList;
-                var configuration = new Service.Configuration();
+                //var configs = Service.ConfigurationList;
+                //var configuration = new Service.Configuration();
                 model.get('collection').each(function(model) { 
                     console.log(model.get('currentConfiguration').get('name')); 
                 });
 
                 this.sourcesModal.show(new ModalSource.View(
                     {
-                        model: this.model, 
-                        id: this.model.get('id'),
-                        configurations: model.get('currentConfiguration')
+                        metatypes: this.model.getSourceMetatypes()
                     })
                 );
-                this.sourcesModal.currentView.$el.modal()
+                this.sourcesModal.currentView.$el.modal();
             }
         }
     });

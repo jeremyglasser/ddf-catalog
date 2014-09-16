@@ -34,13 +34,13 @@ define(function (require) {
         template: 'modalSource',
         tagName: 'div',
         className: 'modal',
-        configurations: null,
+        metatypes: null,
         /**
          * Button events, right now there's a submit button
          * I do not know where to go with the cancel button.
          */
         events: {
-            "change .sourceTypesSelect" : "renderDetails",
+            "change .sourceTypesSelect" : "handleTypeChange",
             "click .submit-button": "submitData",
             "click .cancel-button": "cancel"
         },
@@ -54,8 +54,9 @@ define(function (require) {
          */
         initialize: function(options) {
             _.bindAll(this);
-            this.configurations = options.configurations;
+            this.metatypes = options.metatypes;
             this.modelBinder = new Backbone.ModelBinder();
+            
         },
         onRender: function() {
             this.$el.attr('tabindex', "-1");
@@ -68,22 +69,26 @@ define(function (require) {
          * Renders the type dropdown box
          */
         renderTypeDropdown: function() {
-            var collection = this.model.get('collection');
+            var $sourceTypeSelect = this.$(".sourceTypesSelect");
+            var metatypes = this.metatypes;
             var configs = new Backbone.Collection();
-            if (_.isEmpty(collection)) {
-                configs.add(this.model.get('currentConfiguration'));
-            } else {
-                _.each(collection.models, function(item) {
-                    //if this doesn't have an fpid it isn't a managed service factory
-                    //if it isn't a managed service factory then we can't select anything in the drop down
-                    var current = item.get('currentConfiguration');
-                    configs.add(current);
-                });
-                var $sourceTypeSelect = this.$(".sourceTypesSelect");
-                $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
-                if (!_.isEmpty(configs)) {
-                    var selectedId = collection.at(0).get("fpid");
+            if (_.isArray(metatypes)) {
+                if (metatypes.length === 1) {
+                    var metatype = metatypes.pop();
+                    var config = metatype.get('currentConfiguration');
+                    configs.add(config);
                     $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+                    this.renderDetails(config.get('service'));
+                } else {
+                    _.each(metatypes, function(metatype) {
+                        //if this doesn't have an fpid it isn't a managed service factory
+                        //if it isn't a managed service factory then we can't select anything in the drop down
+                        configs.add(metatype);
+                    });
+                    if (!_.isEmpty(configs)) {
+                        $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
+                        $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+                    }
                 }
             }
         },
@@ -103,28 +108,29 @@ define(function (require) {
         cancel: function() {
             //TODO discard changes somehow
         },
-        renderDetails: function(evt) {
-            var collection = this.model.get('collection');
+        handleTypeChange: function(evt) {
+            var view = this;
+            var collection = view.metatypes; //view.model.get('collection');
             var $select = $(evt.currentTarget);
+            console.log(view.cid);
+            console.log(view.model);
             if ($select.hasClass('sourceTypesSelect')) {
-                var detailsModel = _.find(collection.models, function(item) {
-                    console.log(item.get('currentConfiguration').get('id'));
-                    return item.get('currentConfiguration').get('id') === $select.val();
+                var detailsModel = _.find(collection, function(item) {
+                    console.log(item.get('id'));
+                    console.log($select.val());
+                    return item.get('id') === $select.val();
                 });
-                if (!_.isUndefined(detailsModel)) {
-                    var currentConfig = detailsModel.get('currentConfiguration');
-                    this.details.show(new ModalDetails.View({
-                        model: currentConfig, 
-                        id: currentConfig.get('id') 
-//                        bindingProps: {
-//                            modelBinder: this.modelBinder,
-//                            bindings: bindings
-//                        }
-                    }));
-//                    this.modelBinder.bind(detailsModel.get('currentConfiguration').get('properties'), this.$el, bindings);
-                } else {
-                    this.details.$el.html('');
-                }
+                this.renderDetails(detailsModel);
+            }
+        },
+        renderDetails: function(configuration) {
+            if (!_.isUndefined(configuration)) {
+                this.details.show(new ModalDetails.View({
+                    model: configuration,
+                    id: configuration.get('id')
+                }));
+            } else {
+                $(this.details.el).html('');
             }
         }
     });
