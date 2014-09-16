@@ -137,9 +137,29 @@ define(function (require) {
                     }
                 });
             }
-        }
-    });
+        },
+        getSourceMetatypes: function() {
+            var resModel = this;
+            var metatypes = [];
+            var resModel = this;
+            var metatypes = [];
+            if(resModel.model.get('value')) {
+                resModel.model.get('value').each(function(service) {
+                var id = service.get('id');
+                var name = service.get('name');
+                if (!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) {
+                    metatypes.push(service);
+                }
+                });
+            }
 
+            console.log(metatypes);
+            return metatypes;
+        },
+        isSourceConfiguration: function(configuration) {
+            return (configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1);
+        }
+    })
     return Source;
 
 });

@@ -45,13 +45,13 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         template: 'modalSource',
         tagName: 'div',
         className: 'modal',
-        configurations: null,
+        metatypes: null,
         /**
          * Button events, right now there's a submit button
          * I do not know where to go with the cancel button.
          */
         events: {
-            "change .sourceTypesSelect" : "renderDetails",
+            "change .sourceTypesSelect" : "handleTypeChange",
             "click .submit-button": "submitData",
             "click .cancel-button": "cancel"
         },
@@ -65,8 +65,9 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          */
         initialize: function(options) {
             _.bindAll(this);
-            this.configurations = options.configurations;
+            this.metatypes = options.metatypes;
             this.modelBinder = new Backbone.ModelBinder();
+            
         },
         onRender: function() {
             this.$el.attr('tabindex', "-1");
@@ -101,22 +102,26 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Renders the type dropdown box
          */
         renderTypeDropdown: function() {
-            var collection = this.model.get('collection');
+            var $sourceTypeSelect = this.$(".sourceTypesSelect");
+            var metatypes = this.metatypes;
             var configs = new Backbone.Collection();
-            if (_.isEmpty(collection)) {
-                configs.add(this.model.get('currentConfiguration'));
-            } else {
-                _.each(collection.models, function(item) {
-                    //if this doesn't have an fpid it isn't a managed service factory
-                    //if it isn't a managed service factory then we can't select anything in the drop down
-                    var current = item.get('currentConfiguration');
-                    configs.add(current);
-                });
-                var $sourceTypeSelect = this.$(".sourceTypesSelect");
-                $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
-                if (!_.isEmpty(configs)) {
-                    var selectedId = collection.at(0).get("fpid");
+            if (_.isArray(metatypes)) {
+                if (metatypes.length === 1) {
+                    var metatype = metatypes.pop();
+                    var config = metatype.get('currentConfiguration');
+                    configs.add(config);
                     $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+                    this.renderDetails(config.get('service'));
+                } else {
+                    _.each(metatypes, function(metatype) {
+                        //if this doesn't have an fpid it isn't a managed service factory
+                        //if it isn't a managed service factory then we can't select anything in the drop down
+                        configs.add(metatype);
+                    });
+                    if (!_.isEmpty(configs)) {
+                        $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
+                        $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+                    }
                 }
             }
         },
@@ -136,9 +141,12 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         cancel: function() {
             //TODO discard changes somehow
         },
-        renderDetails: function(evt) {
-            var collection = this.model.get('collection');
+        handleTypeChange: function(evt) {
+            var view = this;
+            var collection = view.metatypes; //view.model.get('collection');
             var $select = $(evt.currentTarget);
+            console.log(view.cid);
+            console.log(view.model);
             if ($select.hasClass('sourceTypesSelect')) {
                 this.modelBinder.unbind();
                 var config = view.findConfigFromId($select.val());
