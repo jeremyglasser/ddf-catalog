@@ -40,8 +40,8 @@ define(function (require) {
     ModalDetails.View = Marionette.ItemView.extend({
 //        template: 'modalSource',
         tagName: 'div',
-        modelBinder: null,
-        bindings: null,
+//        modelBinder: null,
+//        bindings: null,
 
         /**
          * Initialize  the binder with the ManagedServiceFactory model.

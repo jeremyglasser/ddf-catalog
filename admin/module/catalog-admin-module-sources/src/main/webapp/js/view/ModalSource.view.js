@@ -45,7 +45,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         template: 'modalSource',
         tagName: 'div',
         className: 'modal',
-        metatypes: null,
         /**
          * Button events, right now there's a submit button
          * I do not know where to go with the cancel button.
@@ -66,8 +65,12 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         initialize: function(options) {
             _.bindAll(this);
             this.metatypes = options.metatypes;
+            if (options.metatypes.length === 1) {
+                this.model = options.metatypes[0];
+            } else {
+                this.model = null;
+            }
             this.modelBinder = new Backbone.ModelBinder();
-            
         },
         onRender: function() {
             this.$el.attr('tabindex', "-1");
@@ -130,7 +133,10 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Submit to the backend.
          */
         submitData: function() {
-            this.model.get('currentConfiguration').save();
+//            this.model.get('currentConfiguration').save();
+            var model = this.model.get('currentConfiguration');
+            model.save();
+            this.cancel();
         },
         /**
          * unbind the model and dom during close.
@@ -139,7 +145,8 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             this.modelBinder.unbind();
         },
         cancel: function() {
-            //TODO discard changes somehow
+            this.modelBinder.unbind();
+            this.$el.modal("hide");
         },
         handleTypeChange: function(evt) {
             var view = this;
