@@ -66,7 +66,7 @@ define(function (require) {
          */
         setupPopOvers: function() {
             var view = this;
-            view.model.get('service').get('metatype').forEach(function(each) {
+            view.model.get('metatype').forEach(function(each) {
                 if(!_.isUndefined(each.get("description"))) {
                    var options,
                         selector = ".description[data-title='" + each.id + "']";
@@ -88,7 +88,7 @@ define(function (require) {
             var view = this;
             //view.$(".data-section").append(ich.checkboxEnableType(view.managedServiceFactory.toJSON()));
 
-            view.model.get('service').get('metatype').forEach(function(each) {
+            view.model.get('metatype').forEach(function(each) {
                 var type = each.get("type");
                 //TODO re-enable this when this functionality is added back in
 //                var cardinality = each.get("cardinality"); //this is ignored for now and lists will be rendered as a ',' separated list
