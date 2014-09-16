@@ -34,7 +34,6 @@ define(function (require) {
         template: 'modalSource',
         tagName: 'div',
         className: 'modal',
-        metatypes: null,
         /**
          * Button events, right now there's a submit button
          * I do not know where to go with the cancel button.
@@ -55,8 +54,12 @@ define(function (require) {
         initialize: function(options) {
             _.bindAll(this);
             this.metatypes = options.metatypes;
+            if (options.metatypes.length === 1) {
+                this.model = options.metatypes[0];
+            } else {
+                this.model = null;
+            }
             this.modelBinder = new Backbone.ModelBinder();
-            
         },
         onRender: function() {
             this.$el.attr('tabindex', "-1");
@@ -64,6 +67,8 @@ define(function (require) {
             this.$el.attr('aria-hidden', "true");
             this.renderTypeDropdown();
             var bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
+            this.modelBinder.bind(this.model.get('currentConfiguration').get('properties'),
+                    this.$el, this.bindings);
         },
         /**
          * Renders the type dropdown box
@@ -97,7 +102,10 @@ define(function (require) {
          * Submit to the backend.
          */
         submitData: function() {
-            this.model.get('currentConfiguration').save();
+//            this.model.get('currentConfiguration').save();
+            var model = this.model.get('currentConfiguration');
+            model.save();
+            this.cancel();
         },
         /**
          * unbind the model and dom during close.
@@ -106,16 +114,21 @@ define(function (require) {
             this.modelBinder.unbind();
         },
         cancel: function() {
-            //TODO discard changes somehow
+            this.modelBinder.unbind();
+            this.$el.modal("hide");
         },
         handleTypeChange: function(evt) {
             var view = this;
             var collection = view.metatypes; //view.model.get('collection');
             var $select = $(evt.currentTarget);
             if ($select.hasClass('sourceTypesSelect')) {
+                this.modelBinder.unbind();
                 var detailsModel = _.find(collection, function(item) {
                     return item.get('id') === $select.val();
                 });
+                this.model = detailsModel;
+                this.modelBinder.bind(detailsModel.get('currentConfiguration').get('properties'),
+                        view.$el, this.bindings);
                 this.renderDetails(detailsModel);
             }
         },
