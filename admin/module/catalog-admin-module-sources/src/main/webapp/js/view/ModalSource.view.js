@@ -133,7 +133,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Submit to the backend.
          */
         submitData: function() {
-//            this.model.get('currentConfiguration').save();
             var model = this.model.get('currentConfiguration');
             model.save();
             this.cancel();

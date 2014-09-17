@@ -86,7 +86,6 @@ define(function (require) {
          */
         renderDynamicFields: function() {
             var view = this;
-            //view.$(".data-section").append(ich.checkboxEnableType(view.managedServiceFactory.toJSON()));
 
             view.model.get('metatype').forEach(function(each) {
                 var type = each.get("type");
