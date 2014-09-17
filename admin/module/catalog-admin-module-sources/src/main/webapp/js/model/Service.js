@@ -33,6 +33,11 @@ define(function (require) {
     Service.Configuration = Backbone.RelationalModel.extend({
         configUrl: "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0",
 
+        
+        defaults: {
+            properties: new Service.Properties()
+        },
+        
         relations: [
             {
                 type: Backbone.HasOne,
@@ -173,15 +178,34 @@ define(function (require) {
                         data: jData,
                         url: addUrl
                     }).done(function (result) {
-                            deferred.resolve(result);
-                        }).fail(function (error) {
-                            deferred.fail(error);
-                        });
-                }).fail(function (error) {
+                        deferred.resolve(result);
+                    }).fail(function (error) {
                         deferred.fail(error);
                     });
+                }).fail(function (error) {
+                    deferred.fail(error);
+                });
             }
             return deferred;
+        },
+        createNewFromServer: function(deferred) {
+            model.makeConfigCall(model).done(function (data) {
+                var collect = model.collectedData(JSON.parse(data).value);
+                var jData = JSON.stringify(collect);
+
+                return $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: jData,
+                    url: addUrl
+                }).done(function (result) {
+                    deferred.resolve(result);
+                }).fail(function (error) {
+                    deferred.fail(error);
+                });
+            }).fail(function (error) {
+                deferred.fail(error);
+            });
         },
         destroy: function() {
             var deferred = $.Deferred(),
@@ -196,6 +220,36 @@ define(function (require) {
                 }).fail(function (error) {
                     deferred.fail(error);
                 });
+        },
+        initializeFromMSF: function(msf) {
+            this.set({"fpid":msf.get("id")});
+            this.set({"name":msf.get("name")});
+            this.get('properties').set({"service.factoryPid": msf.get("id")});
+            this.initializeFromService(msf);
+        },
+        initializeFromService: function(service) {
+            this.initializeFromMetatype(service.get("metatype"));
+            console.log('initialized from service.');
+        },
+        initializeFromMetatype: function(metatype) {
+            var model = this;
+
+            var idModel = _.find(metatype.models, function(item) {
+                return item.get('id') === 'id';
+            });
+            if (!_.isUndefined(idModel)) {
+                model.set('properties', 
+                        Service.Properties.findOrCreate(idModel.get('defaultValue')));
+            }
+            console.log(model.get('properties'));
+            metatype.forEach(function(obj){
+                var id = obj.get('id');
+                var val = obj.get('defaultValue');
+                if (id !== 'id') {
+                    console.log('setting ' + id + ":" + val);
+                    model.get('properties').set(id, (val) ? val.toString() : null);
+                }
+            });
         }
     });
 
