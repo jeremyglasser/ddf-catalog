@@ -19,6 +19,7 @@ define(function (require) {
     var Backbone = require('backbone'),
         Marionette = require('marionette'),
         ModalDetails = require('js/view/ModalSourceDetails.js'),
+        Service = require('js/model/Service.js'),
         _ = require('underscore'),
         ich = require('icanhaz');
 
@@ -66,9 +67,10 @@ define(function (require) {
             this.$el.attr('role', "dialog");
             this.$el.attr('aria-hidden', "true");
             this.renderTypeDropdown();
-            var bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
-            this.modelBinder.bind(this.model.get('currentConfiguration').get('properties'),
-                    this.$el, this.bindings);
+            if (!_.isNull(this.model)) {
+                this.modelBinder.bind(this.model.get('currentConfiguration').get('properties'),
+                        this.$el, Backbone.ModelBinder.createDefaultBindings(this.el, 'name'));
+            }
         },
         /**
          * Renders the type dropdown box
@@ -102,7 +104,6 @@ define(function (require) {
          * Submit to the backend.
          */
         submitData: function() {
-//            this.model.get('currentConfiguration').save();
             var model = this.model.get('currentConfiguration');
             model.save();
             this.cancel();
@@ -127,9 +128,12 @@ define(function (require) {
                     return item.get('id') === $select.val();
                 });
                 this.model = detailsModel;
-                this.modelBinder.bind(detailsModel.get('currentConfiguration').get('properties'),
-                        view.$el, this.bindings);
-                this.renderDetails(detailsModel);
+                var config = new Service.Configuration();
+                config.initializeFromMSF(this.model);
+                detailsModel.set('currentConfiguration', config);
+                view.renderDetails(detailsModel);
+                view.modelBinder.bind(config.get('properties'),
+                      view.$el, Backbone.ModelBinder.createDefaultBindings(view.el, 'name'));
             }
         },
         renderDetails: function(configuration) {
