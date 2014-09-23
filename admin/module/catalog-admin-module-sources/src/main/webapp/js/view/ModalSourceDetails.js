@@ -91,7 +91,7 @@ define(function (require) {
                 var type = each.get("type");
                 //TODO re-enable this when this functionality is added back in
 //                var cardinality = each.get("cardinality"); //this is ignored for now and lists will be rendered as a ',' separated list
-                if(!_.isUndefined(type)) {
+                if(!_.isUndefined(type) && each.get('id') !== 'id') {
                     //from the Metatype specification
                     // int STRING = 1;
                     // int LONG = 2;
