@@ -28,17 +28,17 @@ define(function (require) {
 
     Source.Model = Backbone.Model.extend({
         configUrl: "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui",
-
-        addConfiguration: function(configuration) {
-            if(this.get("configurations")) {
-                this.get("configurations").add(configuration);
-                this.listenTo(configuration, 'remove', this.removeConfiguration);
-                this.trigger('change');
-            } else {
-                this.set({configurations: new Source.ConfigurationList()});
-                this.get("configurations").add(configuration);
-            }
-        },
+        idAttribute: 'name',
+//        addConfiguration: function(configuration) {
+//            if(this.get("configurations")) {
+//                this.get("configurations").add(configuration);
+//                this.listenTo(configuration, 'remove', this.removeConfiguration);
+//                this.trigger('change');
+//            } else {
+//                this.set({configurations: new Source.ConfigurationList()});
+//                this.get("configurations").add(configuration);
+//            }
+//        },
         addDisabledConfiguration: function(configuration) {
             if(this.get("disabledConfigurations")) {
                 this.get("disabledConfigurations").add(configuration);
@@ -48,18 +48,18 @@ define(function (require) {
                 this.get("disabledConfigurations").add(configuration);
             }
         },
-        removeConfiguration: function(configuration) {
-            if(this.get("configurations").contains(configuration)) {
-                this.stopListening(configuration);
-                this.get("configurations").remove(configuration);
-                if(this.get("configurations").length === 0) {
-                    this.trigger('removeSource', this);
-                }
-            } else if(this.get("disabledConfigurations").contains(configuration)) {
-                this.stopListening(configuration);
-                this.get("disabledConfigurations").remove(configuration);
-            }
-        },
+//        removeConfiguration: function(configuration) {
+//            if(this.get("configurations").contains(configuration)) {
+//                this.stopListening(configuration);
+//                this.get("configurations").remove(configuration);
+//                if(this.get("configurations").length === 0) {
+//                    this.trigger('removeSource', this);
+//                }
+//            } else if(this.get("disabledConfigurations").contains(configuration)) {
+//                this.stopListening(configuration);
+//                this.get("disabledConfigurations").remove(configuration);
+//            }
+//        },
         setCurrentConfiguration: function(configuration) {
             this.set({currentConfiguration: configuration});
         },
@@ -82,35 +82,32 @@ define(function (require) {
 
     Source.Collection = Backbone.Collection.extend({
         model: Source.Model,
-        sourceMap: {},
         addSource: function(configuration, enabled) {
             var source;
-            if(this.sourceMap[configuration.get("id")]) {
-                source = this.sourceMap[configuration.get("id")];
-                if(enabled) {
-                    source.addConfiguration(configuration);
-                } else {
-                    source.addDisabledConfiguration(configuration);
-                }
+            var magicId = configuration.get("properties").get('shortname');
+            if(!magicId){
+                magicId = configuration.get("properties").get('id');
+            }
+            if(this.get(magicId)) {
+                source = this.get(magicId);
             } else {
-                source = new Source.Model();
-                this.sourceMap[configuration.get("id")] = source;
-                if(enabled) {
-                    source.setCurrentConfiguration(configuration);
-                    source.addConfiguration(configuration);
-                } else {
-                    source.addDisabledConfiguration(configuration);
-                }
+                source = new Source.Model({name: magicId});
                 this.add(source);
             }
+            if(enabled) {
+                source.setCurrentConfiguration(configuration);
+            } else {
+                source.addDisabledConfiguration(configuration);
+            }
+            source.trigger('change');
         },
         removeSource: function(source) {
             this.stopListening(source);
             this.remove(source);
-            delete this.sourceMap[source.get('currentConfiguration').get('id')];
+            delete this.remove(source.get('name'));
         },
         comparator: function(model){
-            var id = model.get('currentConfiguration').id.replace('_disabled','');  // scrub the label of the _disable
+            var id = model.get('name');  // scrub the label of the _disable
             return id;
         }
     });
@@ -125,13 +122,18 @@ define(function (require) {
             }
         },
         parseServiceModel: function() {
+            console.log('parseServiceModel');
             var resModel = this;
             if(this.model.get("value")) {
                 this.model.get("value").each(function(service) {
                     if(!_.isEmpty(service.get("configurations"))) {
                         service.get("configurations").each(function(configuration) {
                             if(configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1){
-                                resModel.get("collection").addSource(configuration, true);
+                                if(configuration.get('fpid').indexOf('_disabled') === -1){
+                                    resModel.get("collection").addSource(configuration, true);
+                                } else {
+                                    resModel.get("collection").addSource(configuration, false);
+                                }
                             }
                         });
                     }
