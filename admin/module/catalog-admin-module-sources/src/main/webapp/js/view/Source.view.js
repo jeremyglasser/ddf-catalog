@@ -43,19 +43,23 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
             editModal: '.modal-container',
             details: 'details'
         },
+        initialize: function(){
+            this.listenTo(this.model, 'change', this.render);
+        },
         serializeData: function(){
             var data = {};
 
-            if (this.model && this.model.has('currentConfiguration')) {
-              data = this.model.get('currentConfiguration').toJSON();
+            if(this.model && this.model.has('currentConfiguration')){
+                data.currentConfiguration = this.model.get('currentConfiguration').toJSON();
             }
+            if(this.model && this.model.has('disabledConfigurations')){
+                data.disabledConfigurations = this.model.get('disabledConfigurations').toJSON();
+            }
+            data.name = this.model.get('name');
 
             return data;
         },
-        onRender: function() {
-            if (this.model && this.model.has('currentConfiguration')) {
-            }
-        },
+
         editSource: function() {
             wreqr.vent.trigger('editSource', this.model);
         },

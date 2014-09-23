@@ -14,18 +14,23 @@
  **/
 package org.codice.ddf.catalog.admin.plugin;
 
-import org.codice.ddf.admin.application.plugin.AbstractApplicationConfigurationPlugin;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SourcesPlugin extends AbstractApplicationConfigurationPlugin {
+import org.codice.ddf.admin.application.plugin.AbstractApplicationPlugin;
+
+public class SourcesPlugin extends AbstractApplicationPlugin {
 
 	/**
 	 * Constructor.
 	 */
 	public SourcesPlugin() {
 		this.displayName = "Sources";
-//        this.javascriptLocation = "/applications/js/view/plugins/details/Plugin.view.js";
-		this.iframeLocation = "/sources/index.html";
-		this.addApplicationAssociations("catalog-app");
+        this.iframeLocation = URI.create("/sources/index.html");
+        List<String> apps = new ArrayList<String>();
+        apps.add("catalog-app");
+        this.setAssociations(apps);
 		this.order = 4;
 	}
 }

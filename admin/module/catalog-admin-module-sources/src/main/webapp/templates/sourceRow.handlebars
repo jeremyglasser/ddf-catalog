@@ -13,13 +13,7 @@
  --}}
 <td>
     <a href='#{{id}}' class='newLink editLink' data-toggle="modal">
-        {{#if properties.shortname}}
-            {{properties.shortname}}
-        {{else}}
-	        {{#if id}}
-	            {{id}}
-	        {{/if}}
-        {{/if}}
+        {{name}}
     </a>
     <div class="modal-container">
 
@@ -28,14 +22,23 @@
 <td>
     <div class="source-name">
         <b>
-        {{#if enabled}}
-            {{name}}
+
+
+        {{#if currentConfiguration}}
+            {{currentConfiguration.name}}
         {{else}}
-            {{service.name}}
+            No Active Configuration.
         {{/if}}
         </b>
     </div>
-    <div class="source-id">{{id}}</div>
+    <div class="source-id">
+        {{#if disabledConfigurations}}
+            Number of Disabled Configurations:
+            {{#join disabledConfigurations ','}}
+                {{service.name}}
+            {{/join}}
+        {{/if}}
+    </div>
 </td>
 <td>
     {{#if available}}
