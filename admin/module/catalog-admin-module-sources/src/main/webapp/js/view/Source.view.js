@@ -35,6 +35,7 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
 	SourceView.SourceRow = Marionette.Layout.extend({
         template: "sourceRow",
         tagName: "tr",
+        className: "highlight-on-hover",
         regions: {
             editModal: '.modal-container'
         },
@@ -101,12 +102,10 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
                 }
             });
         }, 
-        editSource: function(metatype, b, c, d) {
-            var metatypes = [];
-            metatypes.push(metatype);
+        editSource: function(model) {
             this.sourcesModal.show(new ModalSource.View(
                 {
-                    metatypes: metatypes
+                    model: model
                 })
             );
             this.sourcesModal.currentView.$el.modal();
