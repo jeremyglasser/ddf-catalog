@@ -16,6 +16,7 @@
 define([
     'icanhaz',
     'marionette',
+    'underscore',
     'js/view/ModalSource.view.js',
     'js/model/Service.js',
     'wreqr',
@@ -23,7 +24,7 @@ define([
     'text!templates/sourceList.handlebars',
     'text!templates/sourceRow.handlebars'
 ],
-function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceRow) {
+function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourceRow) {
 
     var SourceView = {};
 
@@ -34,17 +35,13 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
 	SourceView.SourceRow = Marionette.Layout.extend({
         template: "sourceRow",
         tagName: "tr",
-        events: {
-            'click .editLink': 'editSource'
-        },
-        initialize: function(options) {
-            console.log(this.model);
-        },
         regions: {
             editModal: '.modal-container'
         },
         initialize: function(){
+            _.bindAll(this);
             this.listenTo(this.model, 'change', this.render);
+            this.$el.on('click', this.editSource);
         },
         serializeData: function(){
             var data = {};
@@ -59,6 +56,9 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
 
             return data;
         },
+        onBeforeClose: function() {
+            this.$el.off('click');
+        },
         editSource: function(evt) {
             evt.stopPropagation();
             var model = this.model;
@@ -69,22 +69,24 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
     SourceView.SourceTable = Marionette.CompositeView.extend({
         template: 'sourceList',
         itemView: SourceView.SourceRow,
-        itemViewContainer: 'tbody'
+        itemViewContainer: 'tbody',
     });
 
     SourceView.SourcePage = Marionette.Layout.extend({
         template: 'sourcePage',
         events: {
             'click .refreshButton' : 'refreshSources',
-            'click .addSourceLink' : 'addSource'
+            'click .addSourceLink' : 'addSource',
+            'click .editLink': 'editSource'
         },
         initialize: function(){
-            this.listenTo(wreqr.vent, 'editSource', this.editSource);
-            this.listenTo(wreqr.vent, 'refreshSources', this.refreshSources);
+            var view = this;
+            view.listenTo(wreqr.vent, 'editSource', view.editSource);
+            view.listenTo(wreqr.vent, 'refreshSources', view.refreshSources);
         },
         regions: {
             collectionRegion: '#sourcesRegion',
-            sourcesModal: '#sources-modal',
+            sourcesModal: '#sources-modal'
         },
         onRender: function() {
             this.collectionRegion.show(new SourceView.SourceTable({ model: this.model, collection: this.model.get("collection") }));
@@ -99,7 +101,7 @@ function (ich,Marionette,ModalSource,Service,wreqr,sourcePage,sourceList,sourceR
                 }
             });
         }, 
-        editSource: function(metatype) {
+        editSource: function(metatype, b, c, d) {
             var metatypes = [];
             metatypes.push(metatype);
             this.sourcesModal.show(new ModalSource.View(
