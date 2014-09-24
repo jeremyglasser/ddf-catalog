@@ -14,35 +14,27 @@
  **/
 /*global define*/
 /** Main view page for add. */
-define(function (require) {
+define([
+        'icanhaz',
+        'marionette',
+        'backbone',
+        'underscore',
+        'text!templates/textType.handlebars',
+        'text!templates/passwordType.handlebars',
+        'text!templates/numberType.handlebars',
+        'text!templates/checkboxType.handlebars'
+],
+function (ich,Marionette,Backbone,_,textType,passwordType,numberType,checkboxType) {
 
-    var Backbone = require('backbone'),
-        Marionette = require('marionette'),
-        _ = require('underscore'),
-        ich = require('icanhaz');
-
-    //these templates are part of the admin ui and we expect them to be there
-    if(!ich.textType) {
-        ich.addTemplate('textType', require('text!templates/textType.handlebars'));
-    }
-    if(!ich.passwordType) {
-        ich.addTemplate('passwordType', require('text!templates/passwordType.handlebars'));
-    }
-    if(!ich.numberType) {
-        ich.addTemplate('numberType', require('text!templates/numberType.handlebars'));
-    }
-    if(!ich.checkboxType) {
-        ich.addTemplate('checkboxType', require('text!templates/checkboxType.handlebars'));
-    }
+    ich.addTemplate('textType', textType);
+    ich.addTemplate('passwordType', passwordType);
+    ich.addTemplate('numberType', numberType);
+    ich.addTemplate('checkboxType', checkboxType);
 
     var ModalDetails = {};
 
-    ModalDetails.View = Marionette.ItemView.extend({
-//        template: 'modalSource',
+    ModalDetails.View = Marionette.Layout.extend({
         tagName: 'div',
-//        modelBinder: null,
-//        bindings: null,
-
         /**
          * Initialize  the binder with the ManagedServiceFactory model.
          * @param options
@@ -54,8 +46,6 @@ define(function (require) {
         },
         onRender: function() {
             this.$el.attr('tabindex', "-1");
-//            this.$el.attr('role', "dialog");
-//            this.$el.atstr('aria-hidden', "true");
             this.renderDynamicFields();
             this.setupPopOvers();
 //            this.modelBinder.bind(this.model.get('properties'), this.$el, this.bindings);
@@ -89,6 +79,8 @@ define(function (require) {
 
             view.model.get('metatype').forEach(function(each) {
                 var type = each.get("type");
+                console.log(each.get('id'));
+                console.log(each.get('name'));
                 //TODO re-enable this when this functionality is added back in
 //                var cardinality = each.get("cardinality"); //this is ignored for now and lists will be rendered as a ',' separated list
                 if(!_.isUndefined(type) && each.get('id') !== 'id') {
@@ -119,6 +111,24 @@ define(function (require) {
                     }
                 }
             });
+        }
+    });
+
+    ModalDetails.Buttons = Marionette.ItemView.extend({
+        template: 'sourceButtons',
+        events: {
+            'click .enable-button':'enableSource',
+            'click .disable-button':'disableSource'
+        },
+        enableSource: function(){
+            var view = this;
+            view.model.get('currentConfiguration').set('enabled', true);
+            view.render();
+        },
+        disableSource: function(){
+            var view = this;
+            view.model.get('currentConfiguration').set('enabled', false);
+            view.render();
         }
     });
 

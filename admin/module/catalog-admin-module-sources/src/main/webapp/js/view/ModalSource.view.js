@@ -55,7 +55,8 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             "click .cancel-button": "cancel"
         },
         regions: {
-            details: '.modal-details'
+            details: '.modal-details',
+            buttons: '.source-buttons'
         },
 
         /**
@@ -128,7 +129,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                 }
             }
         },
-
         /**
          * Submit to the backend.
          */
