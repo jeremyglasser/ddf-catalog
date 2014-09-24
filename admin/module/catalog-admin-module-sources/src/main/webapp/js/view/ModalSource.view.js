@@ -60,12 +60,6 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
          */
         initialize: function(options) {
             _.bindAll(this);
-            this.metatypes = options.metatypes;
-            if (options.metatypes.length === 1) {
-                this.model = options.metatypes[0];
-            } else {
-                this.model = null;
-            }
             this.modelBinder = new Backbone.ModelBinder();
         },
         onRender: function() {
@@ -83,27 +77,23 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
          */
         renderTypeDropdown: function() {
             var $sourceTypeSelect = this.$(".sourceTypesSelect");
-            var metatypes = this.metatypes;
-            var configs = new Backbone.Collection();
-            if (_.isArray(metatypes)) {
-                if (metatypes.length === 1) {
-                    var metatype = metatypes.pop();
-                    var config = metatype.get('currentConfiguration');
-                    configs.add(config);
-                    $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
-                    this.renderDetails(config.get('service'));
-                } else {
-                    _.each(metatypes, function(metatype) {
-                        //if this doesn't have an fpid it isn't a managed service factory
-                        //if it isn't a managed service factory then we can't select anything in the drop down
-                        configs.add(metatype);
-                    });
-                    if (!_.isEmpty(configs)) {
-                        $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
-                        $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
-                    }
-                }
+            var configs = this.getAllConfigs();
+            if (!_.isEmpty(configs)) {
+                $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
+                $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
             }
+        },
+        getAllConfigs: function() {
+            var configs = new Backbone.Collection();
+            var currentConfig = this.model.get('currentConfiguration');
+            var disabledConfigs = this.model.get('disabledConfigurations');
+            configs.add(currentConfig);
+            if (disabledConfigs) {
+                disabledConfigs.each(function(config) {
+                    configs.add(config);
+                });
+            }
+            return configs;
         },
         /**
          * Submit to the backend.
@@ -125,26 +115,32 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
         },
         handleTypeChange: function(evt) {
             var view = this;
-            var collection = view.metatypes; //view.model.get('collection');
             var $select = $(evt.currentTarget);
             if ($select.hasClass('sourceTypesSelect')) {
                 this.modelBinder.unbind();
-                var detailsModel = _.find(collection, function(item) {
-                    return item.get('id') === $select.val();
-                });
-                this.model = detailsModel;
+                var selectedService = view.findServiceFromId($select.val());
                 var config = new Service.Configuration();
-                
-                if (!_.isUndefined(detailsModel)) {
-                    config.initializeFromMSF(this.model);
-                    detailsModel.set('currentConfiguration', config);
+                if (!_.isUndefined(selectedService)) {
+                    config.initializeFromMSF(selectedService);
+                    selectedService.set('currentConfiguration', config);
                     view.$('.submit-button').removeAttr('disabled');
                 } else {
                     view.$('.submit-button').attr('disabled','disabled');
                 }
-                view.renderDetails(detailsModel);
+                view.renderDetails(selectedService);
                 view.modelBinder.bind(config.get('properties'),
                       view.$el, Backbone.ModelBinder.createDefaultBindings(view.el, 'name'));
+            }
+        },
+        findServiceFromId: function(id) {
+            var collection = this.getAllConfigs();
+            var model = collection.find(function(item) {
+                return item.get('id') === id;
+            });
+            if (!_.isUndefined(model)) {
+                return model.get('service');
+            } else {
+                return undefined;
             }
         },
         renderDetails: function(configuration) {
