@@ -14,20 +14,25 @@
  **/
 /*global define*/
 /** Main view page for add. */
-define(function (require) {
+define([
+        'icanhaz',
+        'marionette',
+        'backbone',
+        'js/view/ModalSourceDetails.js',
+        'js/model/Service.js',
+        'wreqr',
+        'underscore',
+        'text!templates/sourceModal.handlebars',
+        'text!templates/sourceButtons.handlebars',
+        'text!templates/optionListType.handlebars'
+],
+function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourceButtons,optionListType) {
 
-    var Backbone = require('backbone'),
-        Marionette = require('marionette'),
-        ModalDetails = require('js/view/ModalSourceDetails.js'),
-        Service = require('js/model/Service.js'),
-        _ = require('underscore'),
-        ich = require('icanhaz');
-
-    ich.addTemplate('modalSource', require('text!templates/sourceModal.handlebars'));
-    //these templates are part of the admin ui and we expect them to be there
-    if(!ich.optionListType) {
-        ich.addTemplate('optionListType', require('text!templates/optionListType.handlebars'));
+    ich.addTemplate('modalSource', modalSource);
+    if (!ich.sourceButtons) {
+        ich.addTemplate('sourceButtons', sourceButtons);
     }
+    ich.addTemplate('optionListType', optionListType);
 
     var ModalSource = {};
 
@@ -45,7 +50,8 @@ define(function (require) {
             "click .cancel-button": "cancel"
         },
         regions: {
-            details: '.modal-details'
+            details: '.modal-details',
+            buttons: '.source-buttons'
         },
 
         /**
@@ -99,7 +105,6 @@ define(function (require) {
                 }
             }
         },
-
         /**
          * Submit to the backend.
          */
@@ -129,21 +134,32 @@ define(function (require) {
                 });
                 this.model = detailsModel;
                 var config = new Service.Configuration();
-                config.initializeFromMSF(this.model);
-                detailsModel.set('currentConfiguration', config);
+                
+                if (!_.isUndefined(detailsModel)) {
+                    config.initializeFromMSF(this.model);
+                    detailsModel.set('currentConfiguration', config);
+                    view.$('.submit-button').removeAttr('disabled');
+                } else {
+                    view.$('.submit-button').attr('disabled','disabled');
+                }
                 view.renderDetails(detailsModel);
                 view.modelBinder.bind(config.get('properties'),
                       view.$el, Backbone.ModelBinder.createDefaultBindings(view.el, 'name'));
             }
         },
         renderDetails: function(configuration) {
+            var view = this;
             if (!_.isUndefined(configuration)) {
                 this.details.show(new ModalDetails.View({
                     model: configuration,
                     id: configuration.get('id')
                 }));
+                this.buttons.show(new ModalDetails.Buttons({
+                    model: view.model
+                }));
             } else {
                 $(this.details.el).html('');
+                $(this.buttons.el).html('');
             }
         }
     });
