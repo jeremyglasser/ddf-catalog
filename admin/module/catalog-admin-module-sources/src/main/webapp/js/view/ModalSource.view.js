@@ -78,19 +78,18 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
         renderTypeDropdown: function() {
             var $sourceTypeSelect = this.$(".sourceTypesSelect");
             var configs = this.getAllConfigs();
-            if (!_.isEmpty(configs)) {
-                $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
-                $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
-            }
+            $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
+            $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+            $sourceTypeSelect.val(configs.at(0).get('id')).change();
         },
         getAllConfigs: function() {
             var configs = new Backbone.Collection();
-            var currentConfig = this.model.get('currentConfiguration');
+            var currentConfig = this.model.get('currentConfiguration').get('service');
             var disabledConfigs = this.model.get('disabledConfigurations');
             configs.add(currentConfig);
             if (disabledConfigs) {
                 disabledConfigs.each(function(config) {
-                    configs.add(config);
+                    configs.add(config.get('service'));
                 });
             }
             return configs;
@@ -138,7 +137,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
                 return item.get('id') === id;
             });
             if (!_.isUndefined(model)) {
-                return model.get('service');
+                return model;
             } else {
                 return undefined;
             }
