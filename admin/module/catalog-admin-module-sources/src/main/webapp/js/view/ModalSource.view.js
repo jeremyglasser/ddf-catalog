@@ -102,19 +102,18 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         renderTypeDropdown: function() {
             var $sourceTypeSelect = this.$(".sourceTypesSelect");
             var configs = this.getAllConfigs();
-            if (!_.isEmpty(configs)) {
-                $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
-                $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
-            }
+            $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
+            $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
+            $sourceTypeSelect.val(configs.at(0).get('id')).change();
         },
         getAllConfigs: function() {
             var configs = new Backbone.Collection();
-            var currentConfig = this.model.get('currentConfiguration');
+            var currentConfig = this.model.get('currentConfiguration').get('service');
             var disabledConfigs = this.model.get('disabledConfigurations');
             configs.add(currentConfig);
             if (disabledConfigs) {
                 disabledConfigs.each(function(config) {
-                    configs.add(config);
+                    configs.add(config.get('service'));
                 });
             }
             return configs;
