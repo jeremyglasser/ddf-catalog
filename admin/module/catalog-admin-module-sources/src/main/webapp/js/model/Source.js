@@ -48,18 +48,12 @@ define(function (require) {
                 this.get("disabledConfigurations").add(configuration);
             }
         },
-//        removeConfiguration: function(configuration) {
-//            if(this.get("configurations").contains(configuration)) {
-//                this.stopListening(configuration);
-//                this.get("configurations").remove(configuration);
-//                if(this.get("configurations").length === 0) {
-//                    this.trigger('removeSource', this);
-//                }
-//            } else if(this.get("disabledConfigurations").contains(configuration)) {
-//                this.stopListening(configuration);
-//                this.get("disabledConfigurations").remove(configuration);
-//            }
-//        },
+        removeConfiguration: function(configuration) {
+            if(this.get("disabledConfigurations").contains(configuration)) {
+                this.stopListening(configuration);
+                this.get("disabledConfigurations").remove(configuration);
+            }
+        },
         setCurrentConfiguration: function(configuration) {
             this.set({currentConfiguration: configuration});
         },
@@ -104,7 +98,6 @@ define(function (require) {
         removeSource: function(source) {
             this.stopListening(source);
             this.remove(source);
-            delete this.remove(source.get('name'));
         },
         comparator: function(model){
             var id = model.get('name');  // scrub the label of the _disable
