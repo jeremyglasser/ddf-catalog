@@ -125,7 +125,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Submit to the backend.
          */
         submitData: function() {
-            var model = this.model.get('currentConfiguration');
+            var model = this.model.get('editConfig');
             model.save();
             this.closeAndUnbind();
         },
