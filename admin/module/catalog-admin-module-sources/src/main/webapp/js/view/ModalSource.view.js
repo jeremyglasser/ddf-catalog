@@ -101,7 +101,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
          * Submit to the backend.
          */
         submitData: function() {
-            var model = this.model.get('currentConfiguration');
+            var model = this.model.get('editConfig');
             model.save();
             this.closeAndUnbind();
         },
@@ -124,6 +124,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
             if ($select.hasClass('sourceTypesSelect')) {
                 this.modelBinder.unbind();
                 var config = view.findConfigFromId($select.val());
+                view.model.set('editConfig', config);
                 
                 view.renderDetails(config.get('service'));
                 view.modelBinder.bind(config.get('properties'),
