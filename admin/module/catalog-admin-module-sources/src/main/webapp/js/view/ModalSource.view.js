@@ -103,7 +103,11 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
         submitData: function() {
             var model = this.model.get('currentConfiguration');
             model.save();
-            this.cancel();
+            this.closeAndUnbind();
+        },
+        closeAndUnbind: function() {
+            this.modelBinder.unbind();
+            this.$el.modal("hide");
         },
         /**
          * unbind the model and dom during close.
@@ -112,38 +116,35 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
             this.modelBinder.unbind();
         },
         cancel: function() {
-            this.modelBinder.unbind();
-            this.$el.modal("hide");
+            this.closeAndUnbind();
         },
         handleTypeChange: function(evt) {
             var view = this;
             var $select = $(evt.currentTarget);
             if ($select.hasClass('sourceTypesSelect')) {
                 this.modelBinder.unbind();
-                var selectedService = view.findServiceFromId($select.val());
-                var config = new Service.Configuration();
-                if (!_.isUndefined(selectedService)) {
-                    //config.initializeFromService(selectedService);
-                    selectedService.set('currentConfiguration', config);
-                    view.$('.submit-button').removeAttr('disabled');
-                } else {
-                    view.$('.submit-button').attr('disabled','disabled');
-                }
-                view.renderDetails(selectedService);
+                var config = view.findConfigFromId($select.val());
+                
+                view.renderDetails(config.get('service'));
                 view.modelBinder.bind(config.get('properties'),
                       view.$el, Backbone.ModelBinder.createDefaultBindings(view.el, 'name'));
             }
         },
-        findServiceFromId: function(id) {
-            var collection = this.getAllConfigs();
-            var model = collection.find(function(item) {
-                return item.get('id') === id;
-            });
-            if (!_.isUndefined(model)) {
-                return model;
+        findConfigFromId: function(id) {
+            var model = this.model;
+            var currentConfig = model.get('currentConfiguration');
+            var disabledConfigs = model.get('disabledConfigurations');
+            var config = undefined;
+            if (!_.isUndefined(currentConfig) && currentConfig.get('fpid') === id) {
+                config = currentConfig;
             } else {
-                return undefined;
+                if (!_.isUndefined(disabledConfigs)) {
+                    config = disabledConfigs.find(function(item) {
+                        return item.get('fpid') === id + '_disabled';
+                    });
+                }
             }
+            return config;
         },
         renderDetails: function(configuration) {
             var view = this;
