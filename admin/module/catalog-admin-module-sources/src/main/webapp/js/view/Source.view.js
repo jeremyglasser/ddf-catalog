@@ -119,11 +119,9 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
             if(model) {
                 //var configs = Service.ConfigurationList;
                 //var configuration = new Service.Configuration();
-                this.sourcesModal.show(new ModalSource.View(
-                    {
-                        metatypes: this.model.getSourceMetatypes()
-                    })
-                );
+                this.sourcesModal.show(new ModalSource.View({
+                    model: this.model.getSourceModelWithServices()
+                }));
                 this.sourcesModal.currentView.$el.modal();
             }
         }

@@ -136,8 +136,6 @@ define(function (require) {
         getSourceMetatypes: function() {
             var resModel = this;
             var metatypes = [];
-            var resModel = this;
-            var metatypes = [];
             if(resModel.model.get('value')) {
                 resModel.model.get('value').each(function(service) {
                 var id = service.get('id');
@@ -148,6 +146,24 @@ define(function (require) {
                 });
             }
             return metatypes;
+        },
+        getSourceModelWithServices: function() {
+            var resModel = this;
+            var serviceCollection = resModel.model.get('value');
+            var retModel = new Source.Model();
+            
+            if(serviceCollection) {
+                serviceCollection.each(function(service) {
+                    var id = service.get('id');
+                    var name = service.get('name');
+                    if (!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) {
+                        var config = new Service.Configuration();
+                        config.initializeFromService(service);
+                        retModel.addDisabledConfiguration(config);
+                    }
+                });
+            }
+            return retModel;
         },
         isSourceConfiguration: function(configuration) {
             return (configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1);
