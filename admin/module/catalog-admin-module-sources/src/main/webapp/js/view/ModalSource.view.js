@@ -127,7 +127,11 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         submitData: function() {
             var model = this.model.get('currentConfiguration');
             model.save();
-            this.cancel();
+            this.closeAndUnbind();
+        },
+        closeAndUnbind: function() {
+            this.modelBinder.unbind();
+            this.$el.modal("hide");
         },
         /**
          * unbind the model and dom during close.
@@ -136,8 +140,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             this.modelBinder.unbind();
         },
         cancel: function() {
-            this.modelBinder.unbind();
-            this.$el.modal("hide");
+            this.closeAndUnbind();
         },
         handleTypeChange: function(evt) {
             var view = this;
@@ -158,7 +161,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             var model = this.model;
             var currentConfig = model.get('currentConfiguration');
             var disabledConfigs = model.get('disabledConfigurations');
-            var config = null;
+            var config;
 
             if (!_.isUndefined(currentConfig) && currentConfig.get('fpid') === id) {
                 config = currentConfig;
