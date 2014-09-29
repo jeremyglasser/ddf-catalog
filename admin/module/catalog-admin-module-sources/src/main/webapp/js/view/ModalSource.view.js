@@ -71,6 +71,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             this.$el.attr('tabindex', "-1");
             this.$el.attr('role', "dialog");
             this.$el.attr('aria-hidden', "true");
+            var currentConfig = this.model.get('currentConfiguration');
             this.renderTypeDropdown();
             if (!_.isNull(this.model) && !_.isUndefined(currentConfig)) {
                 this.modelBinder.bind(currentConfig.get('properties'),
@@ -102,16 +103,18 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         renderTypeDropdown: function() {
             var $sourceTypeSelect = this.$(".sourceTypesSelect");
             var configs = this.getAllConfigs();
-            $sourceTypeSelect.append(ich.optionListType({"list": {id : "none", name: "Select Type"}}));
             $sourceTypeSelect.append(ich.optionListType({"list": configs.toJSON()}));
             $sourceTypeSelect.val(configs.at(0).get('id')).change();
         },
         getAllConfigs: function() {
             var configs = new Backbone.Collection();
-            var currentConfig = this.model.get('currentConfiguration').get('service');
             var disabledConfigs = this.model.get('disabledConfigurations');
-            configs.add(currentConfig);
-            if (disabledConfigs) {
+            var currentConfig = this.model.get('currentConfiguration')
+            if (!_.isUndefined(currentConfig)) {
+                var currentService = currentConfig.get('service');
+                configs.add(currentService);
+            }
+            if (!_.isUndefined(disabledConfigs)) {
                 disabledConfigs.each(function(config) {
                     configs.add(config.get('service'));
                 });
