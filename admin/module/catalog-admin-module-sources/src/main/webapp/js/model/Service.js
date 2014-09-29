@@ -229,6 +229,7 @@ define(function (require) {
         },
         initializeFromService: function(service) {
             this.initializeFromMetatype(service.get("metatype"));
+            this.set('service', service);
             console.log('initialized from service.');
         },
         initializeFromMetatype: function(metatype) {
