@@ -228,8 +228,13 @@ define(function (require) {
             this.initializeFromService(msf);
         },
         initializeFromService: function(service) {
+            var fpid = service.get('id');
+            var name = service.get('name');
             this.initializeFromMetatype(service.get("metatype"));
             this.set('service', service);
+            this.set('fpid', fpid);
+            this.set('name', name);
+            this.get('properties').set('service.factoryPid', fpid);
             console.log('initialized from service.');
         },
         initializeFromMetatype: function(metatype) {
