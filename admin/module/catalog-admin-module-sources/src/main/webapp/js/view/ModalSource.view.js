@@ -141,7 +141,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
             } else {
                 if (!_.isUndefined(disabledConfigs)) {
                     config = disabledConfigs.find(function(item) {
-                        return item.get('fpid') === id + '_disabled';
+                        return item.get('service').get('id') === id;
                     });
                 }
             }
