@@ -79,8 +79,6 @@ function (ich,Marionette,Backbone,_,textType,passwordType,numberType,checkboxTyp
 
             view.model.get('metatype').forEach(function(each) {
                 var type = each.get("type");
-                console.log(each.get('id'));
-                console.log(each.get('name'));
                 //TODO re-enable this when this functionality is added back in
 //                var cardinality = each.get("cardinality"); //this is ignored for now and lists will be rendered as a ',' separated list
                 if(!_.isUndefined(type) && each.get('id') !== 'id') {
