@@ -126,8 +126,45 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          */
         submitData: function() {
             var model = this.model.get('editConfig');
-            model.save();
+            console.log('saving model');
+            console.log(model);
+            if (_.isUndefined(model.get('id'))) {
+                if (!this.configExists(model)) {
+                    model.save();
+                } else {
+                    //alert user of name collision
+                }
+            } else {
+                //if model has id, we assume this is an edit/update
+                model.save();
+            }
             this.closeAndUnbind();
+        },
+        configExists: function(config) {
+            var view = this;
+            var model = view.model;
+            var modelConfig = model.get('currentConfiguration');
+            var matchFound = false;
+
+            if (!_.isUndefined(modelConfig) && view.matches(modelConfig, config)) {
+                matchFound = true;
+            } else {
+                matchFound = (undefined !== model.get('disabledConfigurations').find(function(modelConfig) {
+                    return view.matches(modelConfig, config);
+                }));
+            }
+            return matchFound;
+        },
+        /**
+         * This method checks the two configs, returning true iff the 'id' (see getId method below) and 'fpid' match.
+         */
+        matches: function(aConfig, bConfig) {
+            return this.getId(aConfig) === this.getId(bConfig) && aConfig.get('fpid') === bConfig.get('fpid');
+        },
+        //should be able to remove this method when the 'shortname' is removed from existing source metatypes
+        getId: function(config) {
+            var properties = config.get('properties');
+            return properties.get('shortname') || properties.get('id');
         },
         closeAndUnbind: function() {
             this.modelBinder.unbind();
