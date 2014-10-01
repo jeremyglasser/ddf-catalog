@@ -28,16 +28,18 @@
             <form class="form-horizontal add-federated-source">
                 <fieldset>
                     {{#if currentConfiguration.attributes.id}}
-                        <label>Source ID: </label><span> {{currentConfiguration.attributes.id}}</span>
+                        <div class="sourceName"></div>
                     {{/if}}
-                    <div class="control-group">
-                        <label class="control-label">Source Type</label>
-                        <div class="controls">
-                            <select class="sourceTypesSelect"></select>
+                    <div class="bound-controls">
+                        <div class="form-group">
+                            <label class="control-label">Source Type</label>
+                            <div class="controls">
+                                <select class="form-control input-sm sourceTypesSelect"></select>
+                            </div>
                         </div>
+                        <div class="modal-details"></div>
+                        <div class="source-buttons"></div>
                     </div>
-                    <div class="modal-details"></div>
-                    <div class="source-buttons"></div>
                 </fieldset>
             </form>
         </div>
