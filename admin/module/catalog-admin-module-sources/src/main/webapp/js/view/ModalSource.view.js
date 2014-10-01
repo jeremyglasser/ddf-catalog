@@ -20,19 +20,26 @@ define([
         'backbone',
         'js/view/ModalSourceDetails.js',
         'js/model/Service.js',
+        'js/view/Utils.js',
         'wreqr',
         'underscore',
         'text!templates/sourceModal.handlebars',
         'text!templates/sourceButtons.handlebars',
-        'text!templates/optionListType.handlebars'
+        'text!templates/optionListType.handlebars',
+        'text!templates/textType.handlebars'
 ],
-function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourceButtons,optionListType) {
+function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource,sourceButtons,optionListType,textType) {
 
     ich.addTemplate('modalSource', modalSource);
     if (!ich.sourceButtons) {
         ich.addTemplate('sourceButtons', sourceButtons);
     }
-    ich.addTemplate('optionListType', optionListType);
+    if (!ich.optionListType) {
+        ich.addTemplate('optionListType', optionListType);
+    }
+    if (!ich.textType) {
+        ich.addTemplate('textType', textType);
+    }
 
     var ModalSource = {};
 
@@ -47,7 +54,8 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
         events: {
             "change .sourceTypesSelect" : "handleTypeChange",
             "click .submit-button": "submitData",
-            "click .cancel-button": "cancel"
+            "click .cancel-button": "cancel",
+            "change .sourceName": "sourceNameChanged"
         },
         regions: {
             details: '.modal-details',
@@ -63,15 +71,36 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
             this.modelBinder = new Backbone.ModelBinder();
         },
         onRender: function() {
+            var $boundData = this.$el.find('.bound-controls');
+            var currentConfig = this.model.get('currentConfiguration');
+
             this.$el.attr('tabindex', "-1");
             this.$el.attr('role', "dialog");
             this.$el.attr('aria-hidden', "true");
-            var currentConfig = this.model.get('currentConfiguration');
+            this.renderNameField();
             this.renderTypeDropdown();
             if (!_.isNull(this.model) && !_.isUndefined(currentConfig)) {
                 this.modelBinder.bind(currentConfig.get('properties'),
-                        this.$el, Backbone.ModelBinder.createDefaultBindings(this.el, 'name'));
+                        $boundData,
+                        Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
+        },
+        /**
+         * Renders editable name field.
+         */
+        renderNameField: function() {
+            var model = this.model;
+            var $sourceName = this.$(".sourceName");
+            var data = {
+                id: model.id,
+                name: 'Source Name',
+                defaultValue: [model.get('name')],
+                description: 'Unique identifier for all source configurations of this type.'
+            };
+            $sourceName.append(ich.textType(data));
+            $sourceName.val(data.defaultValue);
+            console.log(data.defaultValue);
+            Utils.setupPopOvers($sourceName, data.id, data.name, data.description);
         },
         /**
          * Renders the type dropdown box
@@ -116,16 +145,72 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
             }
             this.closeAndUnbind();
         },
+        sourceNameChanged: function(evt) {
+            console.log(evt);
+            var view = this;
+            var $group = view.$el.find('.sourceName>.control-group');
+            var newName = $(evt.currentTarget).find('input').val().trim();
+            var model = view.model;
+            var config = model.get('currentConfiguration');
+            var disConfigs = model.get('disabledConfigurations');
+            
+            if (newName !== model.get('name')) {
+                if (!view.nameExists(newName)) {
+                    this.setConfigName(config, newName);
+                    if (!_.isUndefined(disConfigs)) {
+                        disConfigs.each(function(cfg) {
+                            view.setConfigName(cfg, newName);
+                        });
+                    }
+                    view.clearError();
+                } else {
+                    //show error
+                    $group.find('.error-text').text('A configuration with the name "' + newName + '" already exists. Please choose another name.')
+                        .show();
+                    view.$el.find('.submit-button').attr('disabled','disabled');
+                    $group.addClass('has-error');
+                }
+            } else {
+                view.clearError();
+            }
+        },
+        clearError: function() {
+            var view = this;
+            var $group = view.$el.find('.sourceName>.control-group');
+            var $error = $group.find('.error-text');
+
+            view.$el.find('.submit-button').removeAttr('disabled');
+            $group.removeClass('has-error');
+            $error.hide();
+        },
+        setConfigName: function(config, name) {
+            if (!_.isUndefined(config)) {
+                var properties =  config.get('properties');
+                properties.set('id', name);
+                properties.set('shortname', name);
+            }
+        },
+        /**
+         * Returns true if any of the existing source configurations have a name matching the one provided and false otherwise.
+         */
+        nameExists: function(name) {
+            var configs = this.model.collection;
+            var match = configs.find(function(sourceConfig) {
+                return sourceConfig.get('name') === name;
+            });
+            return !_.isUndefined(match);
+        },
         configExists: function(config) {
             var view = this;
             var model = view.model;
             var modelConfig = model.get('currentConfiguration');
+            var disabledConfigs = model.get('disabledConfigurations');
             var matchFound = false;
 
             if (!_.isUndefined(modelConfig) && view.matches(modelConfig, config)) {
                 matchFound = true;
-            } else {
-                matchFound = (undefined !== model.get('disabledConfigurations').find(function(modelConfig) {
+            } else if (!_.isUndefined(disabledConfigs)) {
+                matchFound = !_.isUndefined(disabledConfigs.find(function(modelConfig) {
                     return view.matches(modelConfig, config);
                 }));
             }
@@ -157,6 +242,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
         },
         handleTypeChange: function(evt) {
             var view = this;
+            var $boundData = view.$el.find('.bound-controls');
             var $select = $(evt.currentTarget);
             if ($select.hasClass('sourceTypesSelect')) {
                 this.modelBinder.unbind();
@@ -165,7 +251,8 @@ function (ich,Marionette,Backbone,ModalDetails,Service,wreqr,_,modalSource,sourc
                 
                 view.renderDetails(config.get('service'));
                 view.modelBinder.bind(config.get('properties'),
-                      view.$el, Backbone.ModelBinder.createDefaultBindings(view.el, 'name'));
+                      $boundData,
+                      Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
         },
         findConfigFromId: function(id) {
