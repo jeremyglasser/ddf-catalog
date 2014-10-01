@@ -19,19 +19,22 @@ define([
         'marionette',
         'backbone',
         'underscore',
+        'js/view/Utils.js',
         'text!templates/textType.handlebars',
         'text!templates/passwordType.handlebars',
         'text!templates/numberType.handlebars',
         'text!templates/checkboxType.handlebars'
 ],
-function (ich,Marionette,Backbone,_,textType,passwordType,numberType,checkboxType) {
+function (ich,Marionette,Backbone,_,Utils,textType,passwordType,numberType,checkboxType) {
 
     ich.addTemplate('textType', textType);
     ich.addTemplate('passwordType', passwordType);
     ich.addTemplate('numberType', numberType);
     ich.addTemplate('checkboxType', checkboxType);
 
-    var ModalDetails = {};
+    var ModalDetails = {
+        Utils : Utils
+    };
 
     ModalDetails.View = Marionette.Layout.extend({
         tagName: 'div',
@@ -41,16 +44,12 @@ function (ich,Marionette,Backbone,_,textType,passwordType,numberType,checkboxTyp
          */
         initialize: function(options) {
             _.bindAll(this);
-//            this.modelBinder = options.bindingProps.modelBinder;
-//            this.bindings = options.bindingProps.bindings;
         },
         onRender: function() {
             this.$el.attr('tabindex', "-1");
             this.renderDynamicFields();
             this.setupPopOvers();
-//            this.modelBinder.bind(this.model.get('properties'), this.$el, this.bindings);
         },
-
         /**
          * Set up the popovers based on if the selector has a description.
          */
@@ -58,16 +57,26 @@ function (ich,Marionette,Backbone,_,textType,passwordType,numberType,checkboxTyp
             var view = this;
             view.model.get('metatype').forEach(function(each) {
                 if(!_.isUndefined(each.get("description"))) {
-                   var options,
-                        selector = ".description[data-title='" + each.id + "']";
-                    options = {
-                        title: each.get("name"),
-                        content: each.get("description"),
-                        trigger: 'hover'
-                    };
-                    view.$(selector).popover(options);
+                    Utils.setupPopOvers(view.$el, each.id, each.get("name"), each.get("description"));
                 }
             });
+        },
+        /**
+         * Returns true if the metatype entry represents the unique ID for the model.
+         */
+        isIdField: function(metatype) {
+            var val = metatype.get('id');
+            return val === 'id' || val === 'shortname';
+        },
+        renderNameField: function() {
+            var idModel = view.model.get('metatype').find(function(each) {
+                return view.isIdField(each);
+            });
+            if (!_.isUndefined(idModel)) {
+                view.$el.append(ich.textType(idModel.toJSON()));
+            } else {
+                //unable to find name field
+            }
         },
         /**
          * Walk the collection of metatypes
@@ -76,12 +85,12 @@ function (ich,Marionette,Backbone,_,textType,passwordType,numberType,checkboxTyp
          */
         renderDynamicFields: function() {
             var view = this;
-
+            //render the rest of the fields
             view.model.get('metatype').forEach(function(each) {
                 var type = each.get("type");
                 //TODO re-enable this when this functionality is added back in
 //                var cardinality = each.get("cardinality"); //this is ignored for now and lists will be rendered as a ',' separated list
-                if(!_.isUndefined(type) && each.get('id') !== 'id') {
+                if(!_.isUndefined(type) && !view.isIdField(each)) {
                     //from the Metatype specification
                     // int STRING = 1;
                     // int LONG = 2;
