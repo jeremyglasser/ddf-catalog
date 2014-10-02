@@ -46,7 +46,6 @@ function (ich,Marionette,Backbone,_,Utils,textType,passwordType,numberType,check
             _.bindAll(this);
         },
         onRender: function() {
-            this.$el.attr('tabindex', "-1");
             this.renderDynamicFields();
             this.setupPopOvers();
         },

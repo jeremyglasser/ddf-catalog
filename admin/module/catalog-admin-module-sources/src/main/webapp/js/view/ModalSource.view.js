@@ -74,7 +74,6 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
             var $boundData = this.$el.find('.bound-controls');
             var currentConfig = this.model.get('currentConfiguration');
 
-            this.$el.attr('tabindex', "-1");
             this.$el.attr('role', "dialog");
             this.$el.attr('aria-hidden', "true");
             this.renderNameField();
