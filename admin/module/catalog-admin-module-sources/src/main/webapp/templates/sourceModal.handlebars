@@ -25,16 +25,21 @@
             </h4>
         </div>
         <div class="modal-body">
-            <form class="form-horizontal add-federated-source">
+            <form class="form-horizontal add-federated-source container-fluid">
                 <fieldset>
                     {{#if currentConfiguration.attributes.id}}
                         <div class="sourceName"></div>
                     {{/if}}
                     <div class="bound-controls">
-                        <div class="form-group">
-                            <label class="control-label">Source Type</label>
-                            <div class="controls">
+                        <div class="control-group">
+                            <div class="row vpad">
+                            <div class="col-md-4">
+                                <label class="control-label">Source Type</label>
+                            </div>
+                            <div class="controls col-md-7">
                                 <select class="form-control input-sm sourceTypesSelect"></select>
+                            </div>
+                            <div class="col-md-1"></div>
                             </div>
                         </div>
                         <div class="modal-details"></div>
