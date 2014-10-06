@@ -129,8 +129,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          */
         submitData: function() {
             var model = this.model.get('editConfig');
-            console.log('saving model');
-            console.log(model);
             if (_.isUndefined(model.get('id'))) {
                 if (!this.configExists(model)) {
                     model.save();
@@ -151,8 +149,10 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             var model = view.model;
             var config = model.get('currentConfiguration');
             var disConfigs = model.get('disabledConfigurations');
-            
-            if (newName !== model.get('name')) {
+
+            if (newName === '') {
+                view.showError('A configuration must have a name.');
+            } else if (newName !== model.get('name')) {
                 if (!view.nameExists(newName)) {
                     this.setConfigName(config, newName);
                     if (!_.isUndefined(disConfigs)) {
@@ -162,15 +162,19 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                     }
                     view.clearError();
                 } else {
-                    //show error
-                    $group.find('.error-text').text('A configuration with the name "' + newName + '" already exists. Please choose another name.')
-                        .show();
-                    view.$el.find('.submit-button').attr('disabled','disabled');
-                    $group.addClass('has-error');
+                    view.showError('A configuration with the name "' + newName + '" already exists. Please choose another name.');
                 }
             } else {
                 view.clearError();
             }
+        },
+        showError: function(msg) {
+            var view = this;
+            var $group = view.$el.find('.sourceName>.control-group');
+
+            $group.find('.error-text').text(msg).show();
+            view.$el.find('.submit-button').attr('disabled','disabled');
+            $group.addClass('has-error');
         },
         clearError: function() {
             var view = this;
@@ -192,10 +196,13 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Returns true if any of the existing source configurations have a name matching the one provided and false otherwise.
          */
         nameExists: function(name) {
-            var configs = this.model.collection;
-            var match = configs.find(function(sourceConfig) {
-                return sourceConfig.get('name') === name;
-            });
+            var configs = this.model.collection || this.model.get('disabledConfigurations');
+            var match = undefined;
+            if (!_.isUndefined(configs)) {
+                match = configs.find(function(sourceConfig) {
+                    return sourceConfig.get('name') === name;
+                }); 
+            }
             return !_.isUndefined(match);
         },
         configExists: function(config) {
