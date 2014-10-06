@@ -100,13 +100,14 @@ module.exports = function (grunt) {
                     server: './server.js'
                 }
             }
-        },
+        }
     });
 
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-express');
 
     var buildTasks = ['clean', 'bower-offline-install', 'less', 'jshint'];
