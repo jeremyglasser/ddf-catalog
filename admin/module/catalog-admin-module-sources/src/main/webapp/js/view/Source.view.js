@@ -107,20 +107,21 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
             });
         }, 
         editSource: function(model) {
+            var view = this;
             this.sourcesModal.show(new ModalSource.View(
                 {
-                    model: model
+                    model: model,
+                    parentModel: view.model
                 })
             );
             this.sourcesModal.currentView.$el.modal();
         },
         addSource: function() {
-            var model = this.model;
-            if(model) {
-                //var configs = Service.ConfigurationList;
-                //var configuration = new Service.Configuration();
+            var view = this;
+            if(view.model) {
                 this.sourcesModal.show(new ModalSource.View({
-                    model: this.model.getSourceModelWithServices()
+                    model: view.model.getSourceModelWithServices(),
+                    parentModel: view.model
                 }));
                 this.sourcesModal.currentView.$el.modal();
             }
