@@ -66,6 +66,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          */
         initialize: function(options) {
             _.bindAll(this);
+            this.parentModel = options.parentModel;
             this.modelBinder = new Backbone.ModelBinder();
         },
         onRender: function() {
@@ -196,13 +197,10 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Returns true if any of the existing source configurations have a name matching the one provided and false otherwise.
          */
         nameExists: function(name) {
-            var configs = this.model.collection || this.model.get('disabledConfigurations');
-            var match = undefined;
-            if (!_.isUndefined(configs)) {
-                match = configs.find(function(sourceConfig) {
+            var configs = this.parentModel.get('collection');
+            var match = configs.find(function(sourceConfig) {
                     return sourceConfig.get('name') === name;
                 }); 
-            }
             return !_.isUndefined(match);
         },
         configExists: function(config) {
