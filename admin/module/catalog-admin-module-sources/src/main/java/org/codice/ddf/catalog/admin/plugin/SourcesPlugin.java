@@ -31,6 +31,5 @@ public class SourcesPlugin extends AbstractApplicationPlugin {
         List<String> apps = new ArrayList<String>();
         apps.add("catalog-app");
         this.setAssociations(apps);
-		this.order = 4;
 	}
 }
