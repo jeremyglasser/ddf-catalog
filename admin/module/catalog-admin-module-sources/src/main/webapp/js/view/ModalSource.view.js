@@ -98,6 +98,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
                 defaultValue: [initialName],
                 description: 'Unique identifier for all source configurations of this type.'
             };
+            model.set('name', initialName);
             $sourceName.append(ich.textType(data));
             $sourceName.val(data.defaultValue);
             console.log(data.defaultValue);
@@ -132,23 +133,27 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
          */
         submitData: function() {
             var model = this.model.get('editConfig');
-            if (_.isUndefined(model.get('id'))) {
-                if (!this.configExists(model)) {
-                    model.save();
-                } else {
-                    //alert user of name collision
-                }
-            } else {
-                //if model has id, we assume this is an edit/update
+            var parentModel = this.parentModel;
+            if (model) {
                 model.save();
+                if(model.get('enabled')) {
+                    parentModel.get('collection').each(function(config) {
+                        if (config.get('name') === model.get('name')) {
+                            config.set('enabled', false);
+                            config.save(); //TODO these saves need to happen atomically
+                        }
+                    });
+                }
             }
             this.closeAndUnbind();
         },
         sourceNameChanged: function(evt) {
-            console.log(evt);
+            var newName = $(evt.currentTarget).find('input').val().trim();
+            this.checkName(newName);
+        },
+        checkName: function(newName) {
             var view = this;
             var $group = view.$el.find('.sourceName>.control-group');
-            var newName = $(evt.currentTarget).find('input').val().trim();
             var model = view.model;
             var config = model.get('currentConfiguration');
             var disConfigs = model.get('disabledConfigurations');
@@ -156,7 +161,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
             if (newName === '') {
                 view.showError('A configuration must have a name.');
             } else if (newName !== model.get('name')) {
-                if (!view.nameExists(newName)) {
+                if (view.nameIsValid(newName, model.get('editConfig').get('fpid'))) {
                     this.setConfigName(config, newName);
                     if (!_.isUndefined(disConfigs)) {
                         disConfigs.each(function(cfg) {
@@ -168,6 +173,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
                     view.showError('A configuration with the name "' + newName + '" already exists. Please choose another name.');
                 }
             } else {
+                //model name was reverted back to original value
                 view.clearError();
             }
         },
@@ -205,27 +211,33 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
                 }); 
             return !_.isUndefined(match);
         },
-        configExists: function(config) {
+        nameIsValid: function(name, fpid) {
+            var valid = false;
+            var configs = this.parentModel.get('collection');
+            var match = configs.find(function(sourceConfig) {
+                return sourceConfig.get('name') === name;
+            });
+            if (_.isUndefined(match)) {
+                valid = true;
+            } else {
+                valid = !this.fpidExists(match, fpid);
+            }
+            return valid;
+        },
+        fpidExists: function(model, fpid) {
             var view = this;
-            var model = view.model;
             var modelConfig = model.get('currentConfiguration');
             var disabledConfigs = model.get('disabledConfigurations');
             var matchFound = false;
 
-            if (!_.isUndefined(modelConfig) && view.matches(modelConfig, config)) {
+            if (!_.isUndefined(modelConfig) && modelConfig.get('fpid') === fpid) {
                 matchFound = true;
             } else if (!_.isUndefined(disabledConfigs)) {
                 matchFound = !_.isUndefined(disabledConfigs.find(function(modelConfig) {
-                    return view.matches(modelConfig, config);
+                    return modelConfig.get('fpid') === fpid;
                 }));
             }
             return matchFound;
-        },
-        /**
-         * This method checks the two configs, returning true iff the 'id' (see getId method below) and 'fpid' match.
-         */
-        matches: function(aConfig, bConfig) {
-            return this.getId(aConfig) === this.getId(bConfig) && aConfig.get('fpid') === bConfig.get('fpid');
         },
         //should be able to remove this method when the 'shortname' is removed from existing source metatypes
         getId: function(config) {
@@ -253,10 +265,11 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
                 this.modelBinder.unbind();
                 var config = view.findConfigFromId($select.val());
                 view.model.set('editConfig', config);
-                
+
+                var properties = config.get('properties');
+                view.checkName(view.$('.sourceName').find('input').val().trim());
                 view.renderDetails(config.get('service'));
-                view.modelBinder.bind(config.get('properties'),
-                      $boundData,
+                view.modelBinder.bind(properties, $boundData,
                       Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
         },
@@ -270,7 +283,11 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
             } else {
                 if (!_.isUndefined(disabledConfigs)) {
                     config = disabledConfigs.find(function(item) {
-                        return item.get('service').get('id') === id;
+                        var service = item.get('service');
+                        if (!_.isUndefined(service) && !_.isNull(service)) {
+                            return service.get('id') === id;
+                        }
+                        return false;
                     });
                 }
             }
