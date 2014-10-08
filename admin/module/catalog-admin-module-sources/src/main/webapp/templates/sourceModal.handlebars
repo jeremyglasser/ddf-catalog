@@ -41,7 +41,28 @@
                             </div>
                         </div>
                         <div class="modal-details"></div>
-                        <div class="source-buttons"></div>
+                        <!--<div class="source-buttons"></div>-->
+
+                        <div class='metatype control-group'>
+                            <label class="control-label">Source Active</label>
+                            <div class="btn-group card-style-toggle" data-toggle="buttons">
+                            {{#is currentConfiguration.attributes.properties.attributes.enabled "true"}}
+                                <label class="btn active">
+                                    <input type="radio" name="enabled" id="enabled" value="true" checked="checked">Enabled</i>
+                                </label>
+                                <label class="btn">
+                                    <input type="radio" name="enabled" id="enabled" value="false">Disabled</i>
+                                </label>
+                            {{else}}
+                                <label class="btn">
+                                    <input type="radio" name="enabled" id="enabled" value="true">Enabled</i>
+                                </label>
+                                <label class="btn active">
+                                    <input type="radio" name="enabled" id="enabled" value="false" checked="checked">Disabled</i>
+                                </label>
+                            {{/is}}
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
             </form>

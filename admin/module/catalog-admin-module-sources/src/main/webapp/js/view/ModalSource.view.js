@@ -24,16 +24,12 @@ define([
         'wreqr',
         'underscore',
         'text!templates/sourceModal.handlebars',
-        'text!templates/sourceButtons.handlebars',
         'text!templates/optionListType.handlebars',
         'text!templates/textType.handlebars'
 ],
-function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource,sourceButtons,optionListType,textType) {
+function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource,optionListType,textType) {
 
     ich.addTemplate('modalSource', modalSource);
-    if (!ich.sourceButtons) {
-        ich.addTemplate('sourceButtons', sourceButtons);
-    }
     if (!ich.optionListType) {
         ich.addTemplate('optionListType', optionListType);
     }
@@ -45,7 +41,6 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
 
     ModalSource.View = Marionette.Layout.extend({
         template: 'modalSource',
-        tagName: 'div',
         className: 'modal',
         /**
          * Button events, right now there's a submit button
@@ -299,9 +294,6 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
                 this.details.show(new ModalDetails.View({
                     model: configuration,
                     id: configuration.get('id')
-                }));
-                this.buttons.show(new ModalDetails.Buttons({
-                    model: view.model
                 }));
             } else {
                 $(this.details.el).html('');
