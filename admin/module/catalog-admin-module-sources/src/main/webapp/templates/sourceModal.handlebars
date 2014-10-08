@@ -44,21 +44,21 @@
                         <!--<div class="source-buttons"></div>-->
 
                         <div class='metatype control-group'>
-                            <label class="control-label">Source Active</label>
+                            <label class="control-label">Source Enabled</label>
                             <div class="btn-group card-style-toggle" data-toggle="buttons">
                             {{#is currentConfiguration.attributes.properties.attributes.enabled "true"}}
-                                <label class="btn active">
-                                    <input type="radio" name="enabled" id="enabled" value="true" checked="checked">Enabled</i>
+                                <label class="btn btn-xs active">
+                                    <input type="radio" name="enabled" id="enabled" value="true" checked="checked">On</i>
                                 </label>
-                                <label class="btn">
-                                    <input type="radio" name="enabled" id="enabled" value="false">Disabled</i>
+                                <label class="btn btn-xs">
+                                    <input type="radio" name="enabled" id="enabled" value="false">Off</i>
                                 </label>
                             {{else}}
-                                <label class="btn">
-                                    <input type="radio" name="enabled" id="enabled" value="true">Enabled</i>
+                                <label class="btn btn-xs">
+                                    <input type="radio" name="enabled" id="enabled" value="true">On</i>
                                 </label>
-                                <label class="btn active">
-                                    <input type="radio" name="enabled" id="enabled" value="false" checked="checked">Disabled</i>
+                                <label class="btn btn-xs active">
+                                    <input type="radio" name="enabled" id="enabled" value="false" checked="checked">Off</i>
                                 </label>
                             {{/is}}
                             </div>
