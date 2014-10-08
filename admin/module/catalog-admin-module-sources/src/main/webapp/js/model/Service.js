@@ -93,7 +93,7 @@ define(function (require) {
                     url: url,
                     dataType: 'json'
                 }).then(function(){
-                        // masashe some data to match the new backend pid.
+                        // massage some data to match the new backend pid.
                         model.trigger('enabled');
                         deferred.resolve();
                     }).fail(function(){
@@ -104,6 +104,7 @@ define(function (require) {
             }
 
             return deferred;
+
         },
 
         makeDisableCall: function(){
