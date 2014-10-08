@@ -120,24 +120,6 @@ function (ich,Marionette,Backbone,_,Utils,textType,passwordType,numberType,check
         }
     });
 
-    ModalDetails.Buttons = Marionette.ItemView.extend({
-        template: 'sourceButtons',
-        events: {
-            'click .enable-button':'enableSource',
-            'click .disable-button':'disableSource'
-        },
-        enableSource: function(){
-            var view = this;
-            view.model.get('currentConfiguration').set('enabled', true);
-            view.render();
-        },
-        disableSource: function(){
-            var view = this;
-            view.model.get('currentConfiguration').set('enabled', false);
-            view.render();
-        }
-    });
-
     return ModalDetails;
 
 });
