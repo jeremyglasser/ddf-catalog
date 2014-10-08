@@ -43,7 +43,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
 
     ModalSource.View = Marionette.Layout.extend({
         template: 'modalSource',
-        tagName: 'div',
         className: 'modal',
         /**
          * Button events, right now there's a submit button
@@ -299,7 +298,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                 collection: new Service.MetatypeList(toDisplay),
                 service: configuration,
                 configuration: this.model}));
-
         }
     });
 
