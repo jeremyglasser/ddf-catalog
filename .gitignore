@@ -14,3 +14,4 @@ bin/
 atlassian-ide-plugin.xml
 *.sonar-ide.properties
 admin/module/catalog-admin-module-sources/src/main/webapp/css/styles.css
+admin/module/catalog-admin-module-sources/src/main/webapp/css/style.css
