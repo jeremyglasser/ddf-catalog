@@ -69,16 +69,31 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
         onRender: function() {
             var $boundData = this.$el.find('.bound-controls');
             var currentConfig = this.model.get('currentConfiguration');
-
+            var props = currentConfig.get('properties');
+            
             this.$el.attr('role', "dialog");
             this.$el.attr('aria-hidden', "true");
             this.renderNameField();
             this.renderTypeDropdown();
+            this.initRadioButtonUI(props);
             if (!_.isNull(this.model) && !_.isUndefined(currentConfig)) {
-                this.modelBinder.bind(currentConfig.get('properties'),
-                        $boundData,
-                        Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
+                this.modelBinder.bind(props, $boundData, Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
+        },
+        initRadioButtonUI: function(boundModel) {
+            var $radios = this.$el.find('input[type=radio]');
+
+            _.each($radios, function(radio) {
+                var $radio = $(radio);
+                var $label = $radio.closest('label.btn');
+                
+                console.log($label);
+                if (boundModel.get($radio.attr('name')) === $radio.attr('value')) {
+                    $label.addClass('active');
+                } else {
+                    $label.removeClass('active');
+                }
+            });
         },
         /**
          * Renders editable name field.
@@ -264,8 +279,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
                 var properties = config.get('properties');
                 view.checkName(view.$('.sourceName').find('input').val().trim());
                 view.renderDetails(config.get('service'));
-                view.modelBinder.bind(properties, $boundData,
-                      Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
+                view.modelBinder.bind(properties, $boundData, Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
         },
         findConfigFromId: function(id) {
