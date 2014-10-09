@@ -11,16 +11,19 @@
  *
  **/
  --}}
-<div class='{{id}} metatype control-group row vpad'>
-    <div class='controls col-md-12'>
-        <label class='checkbox'>
-            <input type='checkbox' name='{{id}}' id='{{id}}' {{#defaultValue}}{{#.}}checked{{/.}}{{/defaultValue}}>
-            {{name}}
-            {{#if description}}
-                <a href='#' class='description' data-title='{{id}}'>
-                    <i class='glyphicon glyphicon-question-sign'></i>
-                </a>
-            {{/if}}
+<div class='{{id}} metatype control-group'>
+    <label class="control-label">{{name}}</label>
+    <div class="btn-group card-style-toggle" data-toggle="buttons">
+        <label class="btn btn-xs">
+            <input type="radio" name="{{id}}" id="{{id}}" value="true" {{#defaultValue}}{{#.}}checked="checked"{{/.}}{{/defaultValue}}>On</i>
+        </label>
+        <label class="btn btn-xs">
+            <input type="radio" name="{{id}}" id="{{id}}Off" value="false">Off</i>
         </label>
     </div>
+    {{#if description}}
+        <a href='#' class='description' data-title='{{id}}'>
+            <i class='glyphicon glyphicon-question-sign'></i>
+        </a>
+    {{/if}}
 </div>
