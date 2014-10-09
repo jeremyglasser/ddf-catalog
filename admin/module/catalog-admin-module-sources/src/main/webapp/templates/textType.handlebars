@@ -11,29 +11,23 @@
  *
  **/
  --}}
- <div class='{{id}} metatype control-group row vpad'>
-    <div class="col-md-4">
-        <label class='control-label' for='{{id}}'>{{name}}</label>
-    </div>
+ <div class='{{id}} metatype control-group'>
+    <label class='control-label' for='{{id}}'>{{name}}</label>
+    {{#if description}}
+        <a href='#' class='description' data-title='{{id}}'>
+            <i class='glyphicon glyphicon-question-sign'></i>
+        </a>
+    {{/if}}
     <div class="controls">
-        <div class="col-md-7">
-            {{#if optionValues}}
-                <select id="{{id}}" name="{{id}}" class="form-control input-sm">
-                    {{#each optionLabels}}
-                        <option value="{{lookup ../optionValues @index}}" {{#is @index 0}}selected="selected" {{/is}}>{{.}}</option>
-                    {{/each}}
-                </select>
-            {{else}}
-                <input type='text' class='{{id}} metatype form-control input-sm' name='{{id}}' id='{{id}}' value='{{#defaultValue}}{{.}}{{/defaultValue}}'>
-            {{/if}}
-        </div>
-        <div class="col-md-1">
-            {{#if description}}
-                <a href='#' class='description' data-title='{{id}}'>
-                    <i class='glyphicon glyphicon-question-sign'></i>
-                </a>
-            {{/if}}
-        </div>
+        {{#if optionValues}}
+            <select id="{{id}}" name="{{id}}" class="form-control input-sm">
+                {{#each optionLabels}}
+                    <option value="{{lookup ../optionValues @index}}" {{#is @index 0}}selected="selected" {{/is}}>{{.}}</option>
+                {{/each}}
+            </select>
+        {{else}}
+            <input type='text' class='{{id}} metatype form-control input-sm' name='{{id}}' id='{{id}}' value='{{#defaultValue}}{{.}}{{/defaultValue}}'>
+        {{/if}}
     </div>
     <p class='error-text help-block col-md-12'></p>
 </div>
