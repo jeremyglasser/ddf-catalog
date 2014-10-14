@@ -22,22 +22,18 @@
 <td>
     <div class="source-name">
         <b>
-
-
-        {{#if currentConfiguration}}
-            {{currentConfiguration.name}}
-        {{else}}
-            No Active Configuration.
-        {{/if}}
+        <select class="input-sm configurationSelect">
+            {{#if currentConfiguration}}
+                <option value='Disabled'>Disabled</option>
+                <option value='{{currentConfiguration.id}}' selected style="background-color:blue">{{currentConfiguration.name}}</option>
+            {{else}}
+                <option value='Disabled' selected>Disabled</option>
+            {{/if}}
+            {{#disabledConfigurations}}
+                <option value='{{service.id}}' style="background-color:red">{{service.name}}</option>
+            {{/disabledConfigurations}}
+        </select>
         </b>
-    </div>
-    <div class="source-id">
-        {{#if disabledConfigurations}}
-            Number of Disabled Configurations:
-            {{#join disabledConfigurations ','}}
-                {{service.name}}
-            {{/join}}
-        {{/if}}
     </div>
 </td>
 <td colspan="3">
