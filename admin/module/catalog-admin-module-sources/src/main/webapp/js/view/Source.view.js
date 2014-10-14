@@ -39,6 +39,9 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
         regions: {
             editModal: '.modal-container'
         },
+        events: {
+            'click .configurationSelect' : 'changeConfiguration'
+        },
         initialize: function(){
             _.bindAll(this);
             this.listenTo(this.model, 'change', this.render);
@@ -68,6 +71,36 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
             evt.stopPropagation();
             var model = this.model;
             wreqr.vent.trigger('editSource', model);
+        },
+        changeConfiguration: function(evt) {
+            var model = this.model;
+            var currentConfig = model.get('currentConfiguration');
+            var disabledConfigs = model.get('disabledConfigurations');
+            var $select = $(evt.currentTarget);
+            var optionSelected = $select.find("option:selected");
+            var valueSelected = optionSelected.val();
+
+            if (valueSelected === 'Disabled') {
+                var cfgToDisable = currentConfig;
+                model.removeConfiguration(currentConfig);
+                if (!_.isUndefined(cfgToDisable)) {
+                    cfgToDisable.makeDisableCall();
+                }
+            } else {
+                var cfgToEnable = disabledConfigs.find(function(cfg) {
+                    return valueSelected + "_disabled" === cfg.get('fpid');
+                });
+
+                if (cfgToEnable) {
+                    var cfgToDisable = currentConfig;
+                    cfgToEnable.makeEnableCall();
+                    if (!_.isUndefined(cfgToDisable)) {
+                        cfgToDisable.makeDisableCall();
+                    }
+                }
+            }
+            wreqr.vent.trigger('refreshSources');
+            evt.stopPropagation();
         }
     });
 
@@ -82,12 +115,14 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
         events: {
             'click .refreshButton' : 'refreshSources',
             'click .addSourceLink' : 'addSource',
-            'click .editLink': 'editSource'
+            'click .editLink': 'editSource',
+            'click .configurationSelect' : 'changeConfiguration'
         },
         initialize: function(){
             var view = this;
             view.listenTo(wreqr.vent, 'editSource', view.editSource);
             view.listenTo(wreqr.vent, 'refreshSources', view.refreshSources);
+            view.listenTo(wreqr.vent, 'changeConfiguration', view.changeConfiguration);
         },
         regions: {
             collectionRegion: '#sourcesRegion',
