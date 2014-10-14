@@ -5,10 +5,17 @@
   font-size: 8px;
   float: right;
 }
-.table-striped tbody tr.highlight-on-hover:hover td {
-  background-color: @highlightColor;
-}
 
+#sourcesRegion {
+  .table-striped tbody tr.highlight-on-hover:hover td {
+    background-color: @highlightColor;
+  }
+
+  .configurationSelect {
+    border: none;
+    background-color: #f9f9f9;
+  }
+}
 #sources-modal {
 
   .endpointUrl {

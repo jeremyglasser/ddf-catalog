@@ -95,6 +95,8 @@ define(function (require) {
                 }).then(function(){
                         // massage some data to match the new backend pid.
                         model.trigger('enabled');
+                        //enabling the model means the PID will be regenerated. This model no longer exists on the server.
+                        model.destroy();
                         deferred.resolve();
                     }).fail(function(){
                         deferred.reject(new Error('Could not enable configuratoin ' + pid));
@@ -118,6 +120,8 @@ define(function (require) {
                     dataType: 'json'
                 }).then(function(){
                         model.trigger('disabled');
+                        //disabling the model means the PID will be regenerated. This model no longer exists on the server.
+                        model.destroy();
                         deferred.resolve();
                     }).fail(function(){
                         deffered.reject(new Error('Could not disable configuratoin ' + pid));

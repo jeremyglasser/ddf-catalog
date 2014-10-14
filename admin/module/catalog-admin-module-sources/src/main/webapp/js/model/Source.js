@@ -29,16 +29,10 @@ define(function (require) {
     Source.Model = Backbone.Model.extend({
         configUrl: "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui",
         idAttribute: 'name',
-//        addConfiguration: function(configuration) {
-//            if(this.get("configurations")) {
-//                this.get("configurations").add(configuration);
-//                this.listenTo(configuration, 'remove', this.removeConfiguration);
-//                this.trigger('change');
-//            } else {
-//                this.set({configurations: new Source.ConfigurationList()});
-//                this.get("configurations").add(configuration);
-//            }
-//        },
+        defaults: {
+            currentConfiguration: undefined,
+            disabledConfigurations: new Source.ConfigurationList()
+        },
         addDisabledConfiguration: function(configuration) {
             if(this.get("disabledConfigurations")) {
                 this.get("disabledConfigurations").add(configuration);
@@ -52,6 +46,9 @@ define(function (require) {
             if(this.get("disabledConfigurations").contains(configuration)) {
                 this.stopListening(configuration);
                 this.get("disabledConfigurations").remove(configuration);
+            } else if (configuration === this.get("currentConfiguration")) {
+                this.stopListening(configuration);
+                this.set("currentConfiguration", undefined);
             }
         },
         setCurrentConfiguration: function(configuration) {
