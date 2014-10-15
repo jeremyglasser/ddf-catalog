@@ -25,12 +25,12 @@
         <select class="input-sm configurationSelect">
             {{#if currentConfiguration}}
                 <option value='Disabled'>Disabled</option>
-                <option value='{{currentConfiguration.id}}' selected style="background-color:blue">{{currentConfiguration.name}}</option>
+                <option value='{{currentConfiguration.id}}' selected>{{currentConfiguration.name}}</option>
             {{else}}
                 <option value='Disabled' selected>Disabled</option>
             {{/if}}
             {{#disabledConfigurations}}
-                <option value='{{service.id}}' style="background-color:red">{{service.name}}</option>
+                <option value='{{service.id}}'>{{service.name}}</option>
             {{/disabledConfigurations}}
         </select>
         </b>
