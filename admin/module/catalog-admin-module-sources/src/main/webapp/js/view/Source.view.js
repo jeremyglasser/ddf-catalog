@@ -148,7 +148,8 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
             this.sourcesModal.show(new ModalSource.View(
                 {
                     model: model,
-                    parentModel: view.model
+                    parentModel: view.model,
+                    mode: 'edit'
                 })
             );
             this.sourcesModal.currentView.$el.modal();
@@ -158,7 +159,8 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
             if(view.model) {
                 this.sourcesModal.show(new ModalSource.View({
                     model: view.model.getSourceModelWithServices(),
-                    parentModel: view.model
+                    parentModel: view.model,
+                    mode: 'add'
                 }));
                 this.sourcesModal.currentView.$el.modal();
             }
