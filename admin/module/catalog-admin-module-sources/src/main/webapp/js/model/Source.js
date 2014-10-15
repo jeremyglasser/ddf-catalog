@@ -36,10 +36,6 @@ define(function (require) {
         addDisabledConfiguration: function(configuration) {
             if(this.get("disabledConfigurations")) {
                 this.get("disabledConfigurations").add(configuration);
-                this.listenTo(configuration, 'remove', this.removeConfiguration);
-            } else {
-                this.set({disabledConfigurations: new Source.ConfigurationList()});
-                this.get("disabledConfigurations").add(configuration);
             }
         },
         removeConfiguration: function(configuration) {
