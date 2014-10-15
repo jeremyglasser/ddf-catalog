@@ -82,9 +82,9 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
 
             if (valueSelected === 'Disabled') {
                 var cfgToDisable = currentConfig;
-                model.removeConfiguration(currentConfig);
                 if (!_.isUndefined(cfgToDisable)) {
                     cfgToDisable.makeDisableCall();
+                    model.removeConfiguration(cfgToDisable);
                 }
             } else {
                 var cfgToEnable = disabledConfigs.find(function(cfg) {
@@ -94,8 +94,10 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
                 if (cfgToEnable) {
                     var cfgToDisable = currentConfig;
                     cfgToEnable.makeEnableCall();
+                    model.removeConfiguration(cfgToEnable);
                     if (!_.isUndefined(cfgToDisable)) {
                         cfgToDisable.makeDisableCall();
+                        model.removeConfiguration(cfgToDisable);
                     }
                 }
             }
