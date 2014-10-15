@@ -58,7 +58,16 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             details: '.modal-details',
             buttons: '.source-buttons'
         },
+        serializeData: function(){
+            var data = {};
 
+            if(this.model) {
+                data = this.model.toJSON();
+            }
+            data.mode = this.mode;
+
+            return data;
+        },
         /**
          * Initialize  the binder with the ManagedServiceFactory model.
          * @param options
@@ -67,6 +76,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             _.bindAll(this);
             this.parentModel = options.parentModel;
             this.modelBinder = new Backbone.ModelBinder();
+            this.mode = options.mode;
         },
         onRender: function() {
             var $boundData = this.$el.find('.bound-controls');
