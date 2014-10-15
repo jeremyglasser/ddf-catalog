@@ -70,15 +70,15 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         },
         onRender: function() {
             var $boundData = this.$el.find('.bound-controls');
-            var currentConfig = this.model.get('currentConfiguration');
-            var props = currentConfig.get('properties');
+            var config = this.model.get('currentConfiguration') || this.model.get('disabledConfigurations').at(0);
+            var props = config.get('properties');
             
             this.$el.attr('role', "dialog");
             this.$el.attr('aria-hidden', "true");
             this.renderNameField();
             this.renderTypeDropdown();
             this.initRadioButtonUI(props);
-            if (!_.isNull(this.model) && !_.isUndefined(currentConfig)) {
+            if (!_.isNull(this.model)) {
                 this.modelBinder.bind(props, $boundData, Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
         },
