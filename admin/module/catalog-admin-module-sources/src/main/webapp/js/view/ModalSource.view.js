@@ -294,6 +294,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
                 var properties = config.get('properties');
                 view.checkName(view.$('.sourceName').find('input').val().trim());
                 view.renderDetails(config.get('service'));
+                view.initRadioButtonUI(properties);
                 view.modelBinder.bind(properties, $boundData, Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
         },
