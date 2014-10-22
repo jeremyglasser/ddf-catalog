@@ -50,6 +50,24 @@ define(function (require) {
         setCurrentConfiguration: function(configuration) {
             this.set({currentConfiguration: configuration});
         },
+        hasConfiguration: function(configuration) {
+            var id = configuration.get('id');
+            var curConfig = this.get('currentConfiguration');
+            var hasConfig = false;
+
+            var found = this.get("disabledConfigurations").find(function(config) {
+                console.log(config.get('fpid') + ' === ' + (id + "_disabled") + " ?= " + (config.get('fpid') === (id  + "_disabled")));
+                return config.get('fpid') === (id  + "_disabled");
+            });
+            if (_.isUndefined(found)) {
+                if (!_.isUndefined(curConfig)) {
+                    hasConfig = curConfig.get('fpid') === id;
+                }
+            } else {
+                hasConfig = true;
+            }
+            return hasConfig;
+        },
         initializeFromMSF: function(msf) {
             this.set({"fpid":msf.get("id")});
             this.set({"name":msf.get("name")});
@@ -149,9 +167,11 @@ define(function (require) {
                 serviceCollection.each(function(service) {
                     var id = service.get('id');
                     var name = service.get('name');
-                    if (!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) {
+                    if ((!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1)
+                            && !retModel.hasConfiguration(service)) {
                         var config = new Service.Configuration();
                         config.initializeFromService(service);
+                        config.set('fpid', config.get('fpid') + '_disabled');
                         retModel.addDisabledConfiguration(config);
                     }
                 });

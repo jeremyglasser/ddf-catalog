@@ -257,7 +257,6 @@ define(function (require) {
                 var id = obj.get('id');
                 var val = obj.get('defaultValue');
                 if (id !== 'id') {
-                    console.log('setting ' + id + ":" + val);
                     model.get('properties').set(id, (val) ? val.toString() : null);
                 }
             });
