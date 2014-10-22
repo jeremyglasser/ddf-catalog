@@ -295,6 +295,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                 var properties = config.get('properties');
                 view.checkName(view.$('.sourceName').find('input').val().trim());
                 view.renderDetails(config, config.get('service'));
+                view.initRadioButtonUI(properties);
                 view.modelBinder.bind(properties, $boundData,
                       Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
