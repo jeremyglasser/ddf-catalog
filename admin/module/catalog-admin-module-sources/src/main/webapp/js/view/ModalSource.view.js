@@ -218,7 +218,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         setConfigName: function(config, name) {
             if (!_.isUndefined(config)) {
                 var properties =  config.get('properties');
-                properties.set('id', name);
                 properties.set('shortname', name);
             }
         },
@@ -255,7 +254,13 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                 matchFound = true;
             } else if (!_.isUndefined(disabledConfigs)) {
                 matchFound = !_.isUndefined(disabledConfigs.find(function(modelConfig) {
-                    return modelConfig.get('fpid') + "_disabled" === fpid;
+                    //check the ID property to ensure that the config we're checking exists server side
+                    //otherwise assume it's a template/placeholder for filling in the default modal form data
+                    if (_.isUndefined(modelConfig.id)) {
+                        return false;
+                    } else {
+                        return modelConfig.get('fpid') === fpid;
+                    }
                 }));
             }
             return matchFound;
