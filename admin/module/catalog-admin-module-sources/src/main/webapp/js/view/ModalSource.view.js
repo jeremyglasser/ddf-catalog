@@ -255,7 +255,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                 matchFound = true;
             } else if (!_.isUndefined(disabledConfigs)) {
                 matchFound = !_.isUndefined(disabledConfigs.find(function(modelConfig) {
-                    return modelConfig.get('fpid') === fpid;
+                    return modelConfig.get('fpid') + "_disabled" === fpid;
                 }));
             }
             return matchFound;
