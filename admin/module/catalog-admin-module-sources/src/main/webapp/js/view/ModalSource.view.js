@@ -111,7 +111,7 @@ function (ich,Marionette,Backbone,ModalDetails,Service,Utils,wreqr,_,modalSource
         renderNameField: function() {
             var model = this.model;
             var $sourceName = this.$(".sourceName");
-            var initialName = model.get('name') || 'New Configuration';
+            var initialName = model.get('name');
             var data = {
                 id: model.id,
                 name: 'Source Name',
