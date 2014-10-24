@@ -13,7 +13,7 @@
  *
  **/
 
-/*global module*/
+/*global module,require*/
 
 module.exports = function (grunt) {
 
@@ -83,9 +83,9 @@ module.exports = function (grunt) {
                 files: ['src/main/webapp/less/*.less','src/main/webapp/less/**/*.less','src/main/webapp/less/***/*.less'],
                 tasks: ['less']
             },
-            cssFiles : {
-                files :['src/main/webapp/css/*.css'],
-                tasks : ['cssmin']
+            bowerFile: {
+                files: ['src/main/webapp/bower.json'],
+                tasks: ['bower']
             }
         },
         express: {
@@ -102,6 +102,7 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -112,5 +113,38 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', buildTasks);
     grunt.registerTask('default', ['build','express', 'watch']);
+
+    grunt.registerTask('bower-offline-install', 'Bower offline install work-around', function() {
+        var bower = require('bower');
+        var done = this.async();
+        grunt.log.writeln("Trying to install bower packages OFFline.");
+        bower.commands
+            .install([], {save: true}, { offline: true })
+            .on('data', function(data){
+                grunt.log.write(data);
+            })
+            .on('error', function(data){
+                grunt.log.writeln(data);
+                grunt.log.writeln("Trying to install bower packages ONline.");
+                bower.commands
+                    .install()
+                    .on('data', function(data){
+                        grunt.log.write(data);
+                    })
+                    .on('error', function(data){
+                        grunt.log.write(data);
+                        done(false);
+                    })
+                    .on('end', function () {
+                        grunt.log.write("Bower installed online.");
+                        done();
+                    });
+            })
+            .on('end', function () {
+
+                grunt.log.writeln("Bower installed offline.");
+                done();
+            });
+    });
 
 };
