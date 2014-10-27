@@ -12,16 +12,24 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-
 /*global module,require*/
 
 module.exports = function (grunt) {
 
     grunt.initConfig({
+       
         pkg: grunt.file.readJSON('package.json'),
 
         clean: {
           build: ['target/webapp']
+        },
+        bower: {
+            install: {
+                options: {
+                    bowerOptions: {"--offline": true}
+                }
+
+            }
         },
         less: {
             css: {
@@ -109,7 +117,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-express');
 
-    var buildTasks = ['clean', 'less', 'jshint'];
+    var buildTasks = ['clean', 'bower-offline-install', 'less', 'jshint'];
 
     grunt.registerTask('build', buildTasks);
     grunt.registerTask('default', ['build','express', 'watch']);
