@@ -11,9 +11,17 @@
     background-color: @highlightColor;
   }
 
-  .configurationSelect {
-    border: none;
-    background-color: #f9f9f9;
+  .table-striped > tbody > tr:nth-child(odd) > td{
+    .configurationSelect {
+      border: none;
+      background-color: #f9f9f9;
+    }
+  }
+  .table-striped > tbody > tr:nth-child(even) > td{
+    .configurationSelect {
+      border: none;
+      background-color: white;
+    }
   }
 }
 #sources-modal {
