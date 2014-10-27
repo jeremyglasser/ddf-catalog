@@ -40,12 +40,13 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
             editModal: '.modal-container'
         },
         events: {
-            'click .configurationSelect' : 'changeConfiguration'
+            'change .configurationSelect' : 'changeConfiguration',
+            'click .configurationSelect' : 'handleSelector'
         },
         initialize: function(){
             _.bindAll(this);
             this.listenTo(this.model, 'change', this.render);
-            this.$el.on('click', this.editSource);
+            this.$el.on('click', "td", this.editSource);
         },
         serializeData: function(){
             var data = {};
@@ -63,11 +64,10 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
         onBeforeClose: function() {
             this.$el.off('click');
         },
+        handleSelector: function(evt) {
+            evt.stopPropagation();
+        },
         editSource: function(evt) {
-            console.log($(evt.currentTarget).find('a').text());
-            if (evt.currentTarget === this.el) {
-                console.log('matches!!!');
-            }
             evt.stopPropagation();
             var model = this.model;
             wreqr.vent.trigger('editSource', model);
@@ -116,9 +116,7 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
         template: 'sourcePage',
         events: {
             'click .refreshButton' : 'refreshSources',
-            'click .addSourceLink' : 'addSource',
-            'click .editLink': 'editSource',
-            'click .configurationSelect' : 'changeConfiguration'
+            'click .addSourceLink' : 'addSource'
         },
         initialize: function(){
             var view = this;
