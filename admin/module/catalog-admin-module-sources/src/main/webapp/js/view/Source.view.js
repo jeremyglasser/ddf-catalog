@@ -20,15 +20,19 @@ define([
     'js/view/ModalSource.view.js',
     'js/model/Service.js',
     'wreqr',
+    'text!templates/deleteModal.handlebars',
+    'text!templates/deleteSource.handlebars',
     'text!templates/sourcePage.handlebars',
     'text!templates/sourceList.handlebars',
     'text!templates/sourceRow.handlebars'
 ],
-function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourceRow) {
+function (ich,Marionette,_,ModalSource,Service,wreqr,deleteModal,deleteSource,sourcePage,sourceList,sourceRow) {
 
     var SourceView = {};
 
-	ich.addTemplate('sourcePage', sourcePage);
+    ich.addTemplate('deleteModal', deleteModal);
+    ich.addTemplate('deleteSource', deleteSource);
+    ich.addTemplate('sourcePage', sourcePage);
 	ich.addTemplate('sourceList', sourceList);
 	ich.addTemplate('sourceRow', sourceRow);
 
@@ -110,12 +114,16 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
         template: 'sourceList',
         itemView: SourceView.SourceRow,
         itemViewContainer: 'tbody',
+        initialize: function() {
+            console.log('initialized source table');
+        }
     });
 
     SourceView.SourcePage = Marionette.Layout.extend({
         template: 'sourcePage',
         events: {
             'click .refreshButton' : 'refreshSources',
+            'click .removeSourceLink' : 'removeSource',
             'click .addSourceLink' : 'addSource'
         },
         initialize: function(){
@@ -152,6 +160,20 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
             );
             this.sourcesModal.currentView.$el.modal();
         },
+        removeSource: function() {
+            var view = this;
+            if(view.model) {
+//                this.sourcesModal.show(new SourceView.SourceTable({
+//                    model: view.model
+//                }));
+
+                this.sourcesModal.show(new SourceView.DeleteModal({
+                    model: view.model,
+                    collection: view.model.get('collection')
+                }));
+                this.sourcesModal.currentView.$el.modal();
+            }
+        },
         addSource: function() {
             var view = this;
             if(view.model) {
@@ -162,6 +184,44 @@ function (ich,Marionette,_,ModalSource,Service,wreqr,sourcePage,sourceList,sourc
                 }));
                 this.sourcesModal.currentView.$el.modal();
             }
+        }
+    });
+
+//    SourceView.SourceRow = Marionette.Layout.extend({
+//        template: "sourceRow",
+//        tagName: "tr",
+//        className: "highlight-on-hover",
+//        regions: {
+//            editModal: '.modal-container'
+//        },
+//        SourceView.DeleteModal = Marionette.CompositeView.extend({
+//            template: 'sourceList',
+//            itemView: SourceView.SourceRow,
+//            itemViewContainer: 'tbody',
+//        });
+    SourceView.DeleteItem = Marionette.ItemView.extend({
+        template: "deleteSource",
+        initalize: function() {
+            console.log(this.model);
+        }
+    });
+
+    SourceView.DeleteModal  = Marionette.CompositeView.extend({
+        template: 'deleteModal',
+        className: 'modal',
+        itemView: SourceView.DeleteItem,
+        itemViewContainer: '.modal-body',
+        events: {
+            'click .submit-button' : 'deleteSources'
+        },
+        initialize: function() {
+            console.log('initialize modal...');
+        },
+        deleteSources: function() {
+            var sources = this.model.get('collection');
+//            sources.each();
+            console.log('deleting sources...');
+            this.$el.modal("hide");
         }
     });
 

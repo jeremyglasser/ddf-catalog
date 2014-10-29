@@ -7,20 +7,27 @@
 }
 
 #sourcesRegion {
-  .table-striped tbody tr.highlight-on-hover:hover td {
-    background-color: @highlightColor;
-  }
-
-  .table-striped > tbody > tr:nth-child(odd) > td{
-    .configurationSelect {
-      border: none;
-      background-color: #f9f9f9;
+    th > a {
+      text-decoration: none;
     }
-  }
-  .table-striped > tbody > tr:nth-child(even) > td{
-    .configurationSelect {
-      border: none;
-      background-color: white;
+
+  .table-striped > tbody {
+    tr.highlight-on-hover:hover td {
+      background-color: @highlightColor;
+    }
+
+    tr:nth-child(odd) > td{
+      .configurationSelect {
+        border: none;
+        background-color: #f9f9f9;
+      }
+    }
+
+    tr:nth-child(even) > td{
+      .configurationSelect {
+        border: none;
+        background-color: white;
+      }
     }
   }
 }
