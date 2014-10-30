@@ -96,17 +96,11 @@ define(function (require) {
                 }).then(function(){
                         // massage some data to match the new backend pid.
                         model.trigger('enabled');
-<<<<<<< HEAD
                         //enabling the model means the PID will be regenerated. This model no longer exists on the server.
                         model.destroy();
                         deferred.resolve();
                     }).fail(function(){
                         deffered.reject('Could not enable configuratoin ' + pid);
-=======
-                        deferred.resolve();
-                    }).fail(function(){
-                        deferred.reject('Could not enable configuratoin ' + pid);
->>>>>>> DDF-804 - Adding the new SourcesPlugin for the catalog sources tab.
                     });
             } else {
                 deferred.fail("Cannot enable since this model has no pid.");
