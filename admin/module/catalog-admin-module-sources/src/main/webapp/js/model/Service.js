@@ -100,10 +100,10 @@ define(function (require) {
                         model.destroy();
                         deferred.resolve();
                     }).fail(function(){
-                        deffered.reject('Could not enable configuratoin ' + pid);
+                        deferred.reject(new Error('Could not enable configuratoin ' + pid));
                     });
             } else {
-                deferred.fail("Cannot enable since this model has no pid.");
+                deferred.fail(new Error("Cannot enable since this model has no pid."));
             }
 
             return deferred;
@@ -125,7 +125,7 @@ define(function (require) {
                         model.destroy();
                         deferred.resolve();
                     }).fail(function(){
-                        deffered.reject(new Error('Could not disable configuratoin ' + pid));
+                        deferred.reject(new Error('Could not disable configuratoin ' + pid));
                     });
             } else {
                 deferred.reject(new Error("Cannot enable since this model has no pid."));

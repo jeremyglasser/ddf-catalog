@@ -84,9 +84,10 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             var $select = $(evt.currentTarget);
             var optionSelected = $select.find("option:selected");
             var valueSelected = optionSelected.val();
+            var cfgToDisable;
 
             if (valueSelected === 'Disabled') {
-                var cfgToDisable = currentConfig;
+                cfgToDisable = currentConfig;
                 if (!_.isUndefined(cfgToDisable)) {
                     cfgToDisable.makeDisableCall();
                     model.removeConfiguration(cfgToDisable);
@@ -97,7 +98,7 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
                 });
 
                 if (cfgToEnable) {
-                    var cfgToDisable = currentConfig;
+                    cfgToDisable = currentConfig;
                     cfgToEnable.makeEnableCall();
                     model.removeConfiguration(cfgToEnable);
                     if (!_.isUndefined(cfgToDisable)) {
@@ -201,7 +202,6 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             console.log('initialize modal...');
         },
         deleteSources: function() {
-            var sources = this.model.get('collection');
             console.log('deleting sources...');
             this.$el.modal("hide");
         }

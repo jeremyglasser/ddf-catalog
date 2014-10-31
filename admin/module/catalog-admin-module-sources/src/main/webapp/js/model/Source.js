@@ -175,8 +175,8 @@ define(function (require) {
                 serviceCollection.each(function(service) {
                     var id = service.get('id');
                     var name = service.get('name');
-                    if ((!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1)
-                            && !retModel.hasConfiguration(service)) {
+                    if ((!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) && 
+                            !retModel.hasConfiguration(service)) {
                         var config = new Service.Configuration();
                         config.initializeFromService(service);
                         config.set('fpid', config.get('fpid') + '_disabled');
