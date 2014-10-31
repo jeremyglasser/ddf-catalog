@@ -124,9 +124,9 @@ define(function (require) {
                         model.trigger('disabled');
                         //disabling the model means the PID will be regenerated. This model no longer exists on the server.
                         model.destroy();
-                        deferred.resolve();
                     }).fail(function(){
-                        deffered.reject(new Error('Could not disable configuratoin ' + pid));
+                        deferred.reject(new Error('Could not disable configuratoin ' + pid));
+                        deferred.resolve();
                     });
             } else {
                 deferred.reject(new Error("Cannot enable since this model has no pid."));
