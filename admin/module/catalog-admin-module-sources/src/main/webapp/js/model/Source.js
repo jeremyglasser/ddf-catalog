@@ -118,8 +118,9 @@ define(function (require) {
             this.remove(source);
         },
         comparator: function(model){
-            var id = model.get('name');  // scrub the label of the _disable
-            return id;
+            return this.sortBy(function(sourceModel) {
+                return sourceModel.get('name');
+            });
         }
     });
 
