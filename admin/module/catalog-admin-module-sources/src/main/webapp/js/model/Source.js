@@ -30,9 +30,9 @@ define(function (require) {
     Source.Model = Backbone.Model.extend({
         configUrl: "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui",
         idAttribute: 'name',
-        defaults: {
-            currentConfiguration: undefined,
-            disabledConfigurations: new Source.ConfigurationList()
+        initialize: function() {
+            this.set('currentConfiguration', undefined);
+            this.set('disabledConfigurations', new Source.ConfigurationList());
         },
         addDisabledConfiguration: function(configuration) {
             if(this.get("disabledConfigurations")) {
