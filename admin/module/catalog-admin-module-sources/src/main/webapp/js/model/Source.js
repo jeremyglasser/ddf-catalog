@@ -117,11 +117,10 @@ define(function (require) {
             this.stopListening(source);
             this.remove(source);
         },
-        comparator: function(model){
-            return this.sortBy(function(sourceModel) {
-                return sourceModel.get('name');
-            });
-        }
+        comparator: function(model) {
+            var str = model.get('name') || '';
+            return str.toLowerCase();
+        },
     });
 
     Source.Response = Backbone.Model.extend({
@@ -135,21 +134,24 @@ define(function (require) {
         },
         parseServiceModel: function() {
             var resModel = this;
+            var collection = resModel.get('collection');
             if(this.model.get("value")) {
                 this.model.get("value").each(function(service) {
                     if(!_.isEmpty(service.get("configurations"))) {
                         service.get("configurations").each(function(configuration) {
                             if(configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1){
                                 if(configuration.get('fpid').indexOf('_disabled') === -1){
-                                    resModel.get("collection").addSource(configuration, true);
+                                    collection.addSource(configuration, true);
                                 } else {
-                                    resModel.get("collection").addSource(configuration, false);
+                                    collection.addSource(configuration, false);
                                 }
                             }
                         });
                     }
                 });
             }
+            collection.sort();
+            collection.trigger('reset');
         },
         getSourceMetatypes: function() {
             var resModel = this;
