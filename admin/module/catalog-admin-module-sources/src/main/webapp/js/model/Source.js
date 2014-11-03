@@ -164,32 +164,39 @@ define(function (require) {
             }
             return metatypes;
         },
-        getSourceModelWithServices: function() {
+        /**
+         * Returns a SourceModel that has all available source type configurations. Each source type configuration will be added as a 
+         * disabledConfiguration and returned as part of the model. If an initialModel is presented, it will be modified to include any
+         * missing configurations as part of its disabledConfigurations.
+         */
+        getSourceModelWithServices: function(initialModel) {
             var resModel = this;
             var serviceCollection = resModel.model.get('value');
-            var retModel = new Source.Model();
+            if (!initialModel) {
+                initialModel = new Source.Model();
+            }
             
             if(serviceCollection) {
                 serviceCollection.each(function(service) {
                     var id = service.get('id');
                     var name = service.get('name');
                     if ((!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) && 
-                            !retModel.hasConfiguration(service)) {
+                            !initialModel.hasConfiguration(service)) {
                         var config = new Service.Configuration();
                         config.initializeFromService(service);
                         config.set('fpid', config.get('fpid') + '_disabled');
-                        retModel.addDisabledConfiguration(config);
+                        initialModel.addDisabledConfiguration(config);
                     } else {
                         //ensure name field is updated
-                        if (!_.isUndefined(retModel.get('currentConfiguration'))) {
-                            retModel.setNameFromConfig(retModel.get('currentConfiguration'));
-                        } else if (!_.isUndefined(retModel.get('disabledConfigurations'))) {
-                            retModel.setNameFromConfig(retModel.get('disabledConfigurations').at(0));
+                        if (!_.isUndefined(initialModel.get('currentConfiguration'))) {
+                            initialModel.setNameFromConfig(initialModel.get('currentConfiguration'));
+                        } else if (!_.isUndefined(initialModel.get('disabledConfigurations'))) {
+                            initialModel.setNameFromConfig(initialModel.get('disabledConfigurations').at(0));
                         }
                     }
                 });
             }
-            return retModel;
+            return initialModel;
         },
         isSourceConfiguration: function(configuration) {
             return (configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1);
