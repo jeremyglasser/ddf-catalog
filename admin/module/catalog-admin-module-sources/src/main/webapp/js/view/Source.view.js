@@ -197,6 +197,7 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
         },
         deleteSources: function() {
             var view = this;
+            var toDelete = [];
             $(".selectSourceDelete").each(function(index, content) {
                 if (content.checked) {
                     view.collection.each(function (item) {
@@ -206,21 +207,40 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
                         if (currentConfig) {
                             var currentConfigID = currentConfig.get('id');
                             if (currentConfigID === content.value) {
-                                currentConfig.destroy();
+                                item.removeConfiguration(currentConfig);
+                                toDelete.push(view.deleteModel(currentConfig));
                             }
                         }
 
                         if (disableConfigs && !disableConfigs.isEmpty()) {
                             disableConfigs.each(function (disabledConfig) {
                                 if (disabledConfig.get('id') === content.value) {
-                                    disabledConfig.destroy();
+                                    item.removeConfiguration(disabledConfig);
+                                    toDelete.push(view.deleteModel(disabledConfig));
                                 }
                             });
+                        }
+                        if (item.size() <= 0) {
+                            //if no type configurations, delete the entire source.
+                            view.model.get('collection').removeSource(item)
                         }
                     });
                 }
             });
-            this.$el.modal("hide");
+
+            $.when(toDelete).then(function() {
+                wreqr.vent.trigger('refreshSources');
+                view.$el.modal("hide");
+            });
+        },
+        deleteModel: function(source) {
+            var deferred = $.Deferred();
+            source.destroy().success(function() {
+                deferred.resolve();
+            }).fail(function() {
+                deferred.reject(new Error("Unable to delete configuration '" + currentConfig.get('name') + "'."));
+            });
+            return deferred;
         }
     });
 

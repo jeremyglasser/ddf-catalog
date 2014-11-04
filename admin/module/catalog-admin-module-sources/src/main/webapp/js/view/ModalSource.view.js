@@ -151,10 +151,14 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
          * Submit to the backend.
          */
         submitData: function() {
-            var model = this.model.get('editConfig');
+            var view = this;
+            var model = view.model.get('editConfig');
             var parentModel = this.parentModel;
             if (model) {
-                model.save();
+                model.save().then(function() {
+                    view.closeAndUnbind();
+                    wreqr.vent.trigger('refreshSources');
+                });
                 if(model.get('enabled')) {
                     parentModel.get('collection').each(function(config) {
                         if (config.get('name') === model.get('name')) {
@@ -164,7 +168,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                     });
                 }
             }
-            this.closeAndUnbind();
         },
         sourceNameChanged: function(evt) {
             var newName = $(evt.currentTarget).find('input').val().trim();
