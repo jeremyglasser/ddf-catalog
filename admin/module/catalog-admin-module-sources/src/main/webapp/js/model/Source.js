@@ -89,6 +89,10 @@ define(function (require) {
                 var val = obj.defaultValue;
                 src.configuration.set(id, (val) ? val.toString() : null);
             });
+        },
+        size: function() {
+            var ct = _.isUndefined(this.get('currentConfiguration')) ? 0 : 1;
+            return ct + this.get('disabledConfigurations').length;
         }
     });
 
