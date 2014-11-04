@@ -246,7 +246,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             var disabledConfigs = model.get('disabledConfigurations');
             var matchFound = false;
 
-            if (!_.isUndefined(modelConfig) && modelConfig.get('fpid') === fpid) {
+            if (!_.isUndefined(modelConfig) && (modelConfig.get('fpid') === fpid || modelConfig.get('fpid') + "_disabled" === fpid)) {
                 matchFound = true;
             } else if (!_.isUndefined(disabledConfigs)) {
                 matchFound = !_.isUndefined(disabledConfigs.find(function(modelConfig) {
