@@ -308,9 +308,11 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             } else {
                 if (!_.isUndefined(disabledConfigs)) {
                     config = disabledConfigs.find(function(item) {
-                        var configId = item.get('fpid');
-                        //scrub _disabled from the end of the id and compare
-                        return configId.substring(0, configId.indexOf("_disabled")) === id;
+                        var service = item.get('service');
+                        if (!_.isUndefined(service) && !_.isNull(service)) {
+                            return service.get('id') === id;
+                        }
+                        return false;
                     });
                 }
             }
