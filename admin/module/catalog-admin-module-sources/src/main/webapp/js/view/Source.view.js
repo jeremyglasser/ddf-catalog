@@ -222,7 +222,7 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
                         }
                         if (item.size() <= 0) {
                             //if no type configurations, delete the entire source.
-                            view.model.get('collection').removeSource(item)
+                            view.model.get('collection').removeSource(item);
                         }
                     });
                 }
@@ -238,7 +238,7 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             source.destroy().success(function() {
                 deferred.resolve();
             }).fail(function() {
-                deferred.reject(new Error("Unable to delete configuration '" + currentConfig.get('name') + "'."));
+                deferred.reject(new Error("Unable to delete configuration '" + source.get('name') + "'."));
             });
             return deferred;
         }
