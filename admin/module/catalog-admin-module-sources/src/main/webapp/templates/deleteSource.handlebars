@@ -11,17 +11,14 @@
  *
  **/
  --}}
-<div>
-    <a href='#{{id}}' class='newLink' data-toggle="modal">
-        {{name}}
-    </a>
-    <br>
-    <ul>
-        {{#if currentConfiguration}}
-            <li><input class="selectSourceDelete" type="checkbox" value="{{currentConfiguration.attributes.id}}"> {{currentConfiguration.attributes.name}}</li>
-        {{/if}}
-        {{#each disabledConfigurations.models}}
-            <li><input class="selectSourceDelete" type="checkbox" value="{{attributes.id}}">(Disabled) {{attributes.service.attributes.name}}</li>
-        {{/each}}
-    </ul>
-</div>
+<div class="delete-source-name">{{name}}</div>
+{{#if currentConfiguration}}
+    <div class="delete-source-config">
+        <input class="selectSourceDelete" type="checkbox" value="{{currentConfiguration.attributes.id}}"> {{currentConfiguration.attributes.name}}
+    </div>
+{{/if}}
+{{#each disabledConfigurations.models}}
+    <div class="delete-source-config">
+        <input class="selectSourceDelete" type="checkbox" value="{{attributes.id}}"> {{attributes.service.attributes.name}} <span class="label label-danger">Disabled</label>
+    </div>
+{{/each}}
