@@ -179,7 +179,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             var disConfigs = model.get('disabledConfigurations');
 
             if (newName === '') {
-                view.showError('A configuration must have a name.');
+                view.showError('A source must have a name.');
             } else if (newName !== model.get('name')) {
                 if (view.nameIsValid(newName, model.get('editConfig').get('fpid'))) {
                     this.setConfigName(config, newName);
