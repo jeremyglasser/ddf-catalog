@@ -118,7 +118,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                 defaultValue: [initialName],
                 description: 'Unique identifier for all source configurations of this type.'
             };
-            model.set('name', initialName);
             $sourceName.append(ich.textType(data));
             $sourceName.val(data.defaultValue);
             Utils.setupPopOvers($sourceName, data.id, data.name, data.description);

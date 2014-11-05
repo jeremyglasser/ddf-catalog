@@ -38,7 +38,6 @@ define(function (require) {
             if(this.get("disabledConfigurations")) {
                 this.get("disabledConfigurations").add(configuration);
             }
-            this.setNameFromConfig(configuration);
         },
         removeConfiguration: function(configuration) {
             if(this.get("disabledConfigurations").contains(configuration)) {
@@ -51,12 +50,6 @@ define(function (require) {
         },
         setCurrentConfiguration: function(configuration) {
             this.set({currentConfiguration: configuration});
-            this.setNameFromConfig(configuration);
-        },
-        setNameFromConfig: function(config) {
-            if (!this.get('name') && !_.isUndefined(config) && !_.isUndefined(config.get('properties'))) {
-                this.set('name', config.get('properties').get('shortname'));
-            }
         },
         hasConfiguration: function(configuration) {
             var id = configuration.get('id');
@@ -193,13 +186,6 @@ define(function (require) {
                         config.initializeFromService(service);
                         config.set('fpid', config.get('fpid') + '_disabled');
                         initialModel.addDisabledConfiguration(config);
-                    } else {
-                        //ensure name field is updated
-                        if (!_.isUndefined(initialModel.get('currentConfiguration'))) {
-                            initialModel.setNameFromConfig(initialModel.get('currentConfiguration'));
-                        } else if (!_.isUndefined(initialModel.get('disabledConfigurations'))) {
-                            initialModel.setNameFromConfig(initialModel.get('disabledConfigurations').at(0));
-                        }
                     }
                 });
             }
