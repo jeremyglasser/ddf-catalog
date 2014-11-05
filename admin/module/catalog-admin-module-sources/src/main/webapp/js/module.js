@@ -32,9 +32,6 @@ define(function(require) {
             delay: 30000
         };
 
-        var servicePoller = poller.get(serviceModel, options);
-        servicePoller.start();
-
         var sourceResponse = new Source.Response({model: serviceModel});
 
         var sourcePage = new SourceView.SourcePage({model: sourceResponse});
