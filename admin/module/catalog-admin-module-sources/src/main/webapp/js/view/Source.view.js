@@ -46,12 +46,12 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
         },
         events: {
             'change .configurationSelect' : 'changeConfiguration',
-            'click .configurationSelect' : 'handleSelector'
+            'click .configurationSelect' : 'handleSelector',
+            'click td' : 'editSource'
         },
         initialize: function(){
             _.bindAll(this);
             this.listenTo(this.model, 'change', this.render);
-            this.$el.on('click', "td", this.editSource);
         },
         serializeData: function(){
             var data = {};
@@ -65,9 +65,6 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             data.name = this.model.get('name');
 
             return data;
-        },
-        onBeforeClose: function() {
-            this.$el.off('click');
         },
         handleSelector: function(evt) {
             evt.stopPropagation();
@@ -126,10 +123,9 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             'click .addSourceLink' : 'addSource'
         },
         initialize: function(){
-            var view = this;
-            view.listenTo(wreqr.vent, 'editSource', view.editSource);
-            view.listenTo(wreqr.vent, 'refreshSources', view.refreshSources);
-            view.listenTo(wreqr.vent, 'changeConfiguration', view.changeConfiguration);
+            this.listenTo(wreqr.vent, 'editSource', this.editSource);
+            this.listenTo(wreqr.vent, 'refreshSources', this.refreshSources);
+            this.listenTo(wreqr.vent, 'changeConfiguration', this.changeConfiguration);
         },
         regions: {
             collectionRegion: '#sourcesRegion',
@@ -149,33 +145,30 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             });
         }, 
         editSource: function(model) {
-            var view = this;
             this.sourcesModal.show(new ModalSource.View(
                 {
                     model: model,
-                    parentModel: view.model,
+                    parentModel: this.model,
                     mode: 'edit'
                 })
             );
             this.sourcesModal.currentView.$el.modal();
         },
         removeSource: function() {
-            var view = this;
-            if(view.model) {
+            if(this.model) {
 
                 this.sourcesModal.show(new SourceView.DeleteModal({
-                    model: view.model,
-                    collection: view.model.get('collection')
+                    model: this.model,
+                    collection: this.model.get('collection')
                 }));
                 this.sourcesModal.currentView.$el.modal();
             }
         },
         addSource: function() {
-            var view = this;
-            if(view.model) {
+            if(this.model) {
                 this.sourcesModal.show(new ModalSource.View({
-                    model: view.model.getSourceModelWithServices(),
-                    parentModel: view.model,
+                    model: this.model.getSourceModelWithServices(),
+                    parentModel: this.model,
                     mode: 'add'
                 }));
                 this.sourcesModal.currentView.$el.modal();

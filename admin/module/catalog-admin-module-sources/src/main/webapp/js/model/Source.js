@@ -93,14 +93,14 @@ define(function (require) {
         model: Source.Model,
         addSource: function(configuration, enabled) {
             var source;
-            var magicId = configuration.get("properties").get('shortname');
-            if(!magicId){
-                magicId = configuration.get("properties").get('id');
+            var sourceId = configuration.get("properties").get('shortname');
+            if(!sourceId){
+                sourceId = configuration.get("properties").get('id');
             }
-            if(this.get(magicId)) {
-                source = this.get(magicId);
+            if(this.get(sourceId)) {
+                source = this.get(sourceId);
             } else {
-                source = new Source.Model({name: magicId});
+                source = new Source.Model({name: sourceId});
                 this.add(source);
             }
             if(enabled) {

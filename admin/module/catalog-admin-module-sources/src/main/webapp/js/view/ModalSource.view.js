@@ -93,9 +93,10 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         },
         initRadioButtonUI: function(boundModel) {
             var $radios = this.$el.find('input[type=radio]');
+            var view = this;
 
             _.each($radios, function(radio) {
-                var $radio = $(radio);
+                var $radio = view.$(radio);
                 var $label = $radio.closest('label.btn');
                 
                 if (boundModel.get($radio.attr('name')) === $radio.attr('value')) {
@@ -169,7 +170,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             }
         },
         sourceNameChanged: function(evt) {
-            var newName = $(evt.currentTarget).find('input').val().trim();
+            var newName = this.$(evt.currentTarget).find('input').val().trim();
             this.checkName(newName);
         },
         checkName: function(newName) {
@@ -284,7 +285,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         handleTypeChange: function(evt) {
             var view = this;
             var $boundData = view.$el.find('.bound-controls');
-            var $select = $(evt.currentTarget);
+            var $select = this.$(evt.currentTarget);
             if ($select.hasClass('sourceTypesSelect')) {
                 this.modelBinder.unbind();
                 var config = view.findConfigFromId($select.val());
@@ -328,8 +329,8 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                     service: configuration,
                     configuration: this.model}));
             } else {
-                $(this.details.el).html('');
-                $(this.buttons.el).html('');
+                this.$(this.details.el).html('');
+                this.$(this.buttons.el).html('');
             }
         }
     });
