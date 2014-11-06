@@ -189,11 +189,9 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             var region = this.application.getRegion('sourcesModal');
             var iFrameModalDOM = $('#IframeModalDOM');
             modalView.$el.on('hidden.bs.modal', function () {
-                console.log('hide modal');
                 iFrameModalDOM.hide();
             });
             modalView.$el.on('shown.bs.modal', function () {
-                console.log('show modal');
                 var modalHeight = (modalView.$el.height() * 1.7) ;
                 iFrameModalDOM.height(modalHeight);
                 iFrameModalDOM.show();
