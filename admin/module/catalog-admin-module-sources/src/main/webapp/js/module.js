@@ -18,7 +18,6 @@ define(function(require) {
 
     var Application = require('js/application'),
         SourceView = require('js/view/Source.view.js'),
-        poller = require('poller'),
         Source = require('js/model/Source.js');
 
     Application.App.module('Sources', function(SourceModule, App, Backbone, Marionette)  {
@@ -27,10 +26,6 @@ define(function(require) {
 
         var serviceModel = new Service.Response();
         serviceModel.fetch();
-
-        var options = {
-            delay: 30000
-        };
 
         var sourceResponse = new Source.Response({model: serviceModel});
 
