@@ -136,8 +136,9 @@ define(function (require) {
                 this.model.get("value").each(function(service) {
                     if(!_.isEmpty(service.get("configurations"))) {
                         service.get("configurations").each(function(configuration) {
-                            if(resModel.isSourceName(configuration.get('fpid')) || 
-                                    (configuration.get('service') && resModel.isSourceName(configuration.get('service').get('name')))){
+                            var cfgService = configuration.get('service');
+                            if(configuration.get('id') && (resModel.isSourceName(configuration.get('fpid')) || 
+                                    (cfgService && resModel.isSourceName(cfgService.get('name'))))){
                                 if(configuration.get('fpid').indexOf('_disabled') === -1){
                                     collection.addSource(configuration, true);
                                 } else {
