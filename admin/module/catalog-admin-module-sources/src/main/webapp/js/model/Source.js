@@ -136,7 +136,8 @@ define(function (require) {
                 this.model.get("value").each(function(service) {
                     if(!_.isEmpty(service.get("configurations"))) {
                         service.get("configurations").each(function(configuration) {
-                            if(configuration.get('fpid') && configuration.get('id') && configuration.get('fpid').indexOf('Source') !== -1){
+                            if(resModel.isSourceName(configuration.get('fpid')) || 
+                                    (configuration.get('service') && resModel.isSourceName(configuration.get('service').get('name')))){
                                 if(configuration.get('fpid').indexOf('_disabled') === -1){
                                     collection.addSource(configuration, true);
                                 } else {
@@ -157,12 +158,15 @@ define(function (require) {
                 resModel.model.get('value').each(function(service) {
                 var id = service.get('id');
                 var name = service.get('name');
-                if (!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) {
+                if (this.isSourceName(id) || this.isSourceName(name)) {
                     metatypes.push(service);
                 }
                 });
             }
             return metatypes;
+        },
+        isSourceName: function(val) {
+            return val && val.indexOf('Source') !== -1;
         },
         /**
          * Returns a SourceModel that has all available source type configurations. Each source type configuration will be added as a 
@@ -180,7 +184,9 @@ define(function (require) {
                 serviceCollection.each(function(service) {
                     var id = service.get('id');
                     var name = service.get('name');
-                    if ((!_.isUndefined(id) && id.indexOf('Source') !== -1 || !_.isUndefined(name) && name.indexOf('Source') !== -1) && 
+                    if ((!_.isUndefined(id) && 
+                            (id.indexOf('Source') !== -1 || id.indexOf('Source') !== -1) || 
+                            !_.isUndefined(name) && (name.indexOf('Source') !== -1 || name.indexOf('Service') !== -1)) && 
                             !initialModel.hasConfiguration(service)) {
                         var config = new Service.Configuration();
                         config.initializeFromService(service);
