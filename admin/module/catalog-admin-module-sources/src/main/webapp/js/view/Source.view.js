@@ -126,6 +126,9 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             this.listenTo(wreqr.vent, 'editSource', this.editSource);
             this.listenTo(wreqr.vent, 'refreshSources', this.refreshSources);
             this.listenTo(wreqr.vent, 'changeConfiguration', this.changeConfiguration);
+            new SourceView.ModalController({
+                application: this
+            });
         },
         regions: {
             collectionRegion: '#sourcesRegion',
@@ -145,34 +148,58 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
             });
         }, 
         editSource: function(model) {
-            this.sourcesModal.show(new ModalSource.View(
-                {
+            wreqr.vent.trigger("showModal", 
+                new ModalSource.View({
                     model: model,
                     parentModel: this.model,
                     mode: 'edit'
                 })
             );
-            this.sourcesModal.currentView.$el.modal();
         },
         removeSource: function() {
             if(this.model) {
-
-                this.sourcesModal.show(new SourceView.DeleteModal({
-                    model: this.model,
-                    collection: this.model.get('collection')
-                }));
-                this.sourcesModal.currentView.$el.modal();
+                wreqr.vent.trigger("showModal", 
+                    new SourceView.DeleteModal({
+                        model: this.model,
+                        collection: this.model.get('collection')
+                    })
+                );
             }
         },
         addSource: function() {
             if(this.model) {
-                this.sourcesModal.show(new ModalSource.View({
-                    model: this.model.getSourceModelWithServices(),
-                    parentModel: this.model,
-                    mode: 'add'
-                }));
-                this.sourcesModal.currentView.$el.modal();
+                wreqr.vent.trigger("showModal", 
+                    new ModalSource.View({
+                        model: this.model.getSourceModelWithServices(),
+                        parentModel: this.model,
+                        mode: 'add'
+                    })
+                );
             }
+        }
+    });
+
+    SourceView.ModalController = Marionette.Controller.extend({
+        initialize: function (options) {
+            this.application = options.application;
+            this.listenTo(wreqr.vent, "showModal", this.showModal);
+        },
+        showModal: function(modalView) {
+            // Global div for workaround with iframe resize and modals
+            var region = this.application.getRegion('sourcesModal');
+            var iFrameModalDOM = $('#IframeModalDOM');
+            modalView.$el.on('hidden.bs.modal', function () {
+                console.log('hide modal');
+                iFrameModalDOM.hide();
+            });
+            modalView.$el.on('shown.bs.modal', function () {
+                console.log('show modal');
+                var modalHeight = (modalView.$el.height() * 1.7) ;
+                iFrameModalDOM.height(modalHeight);
+                iFrameModalDOM.show();
+            });
+            region.show(modalView);
+            region.currentView.$el.modal();
         }
     });
 
