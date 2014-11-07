@@ -215,41 +215,46 @@ function (ich,Marionette,_,$,ModalSource,Service,wreqr,deleteModal,deleteSource,
         },
         deleteSources: function() {
             var view = this;
-            var toDelete = [];
-            $(".selectSourceDelete").each(function(index, content) {
-                if (content.checked) {
-                    view.collection.each(function (item) {
-                        var currentConfig = item.get('currentConfiguration');
-                        var disableConfigs = item.get('disabledConfigurations');
+            var itemsToRemove = [];
+            view.collection.each(function (item) {
+                var toDelete = [];
+                var currentConfig = item.get('currentConfiguration');
+                var disableConfigs = item.get('disabledConfigurations');
+                view.$(".selectSourceDelete").each(function(index, content) {
+                    if (content.checked) {
 
-                        if (currentConfig) {
-                            var currentConfigID = currentConfig.get('id');
-                            if (currentConfigID === content.value) {
-                                item.removeConfiguration(currentConfig);
-                                toDelete.push(view.deleteModel(currentConfig));
-                            }
-                        }
-
-                        if (disableConfigs && !disableConfigs.isEmpty()) {
+                        var id = currentConfig ? currentConfig.get('id') : null;
+                        if (id === content.value) {
+                            toDelete.push(currentConfig);
+                        } else if (disableConfigs) {
                             disableConfigs.each(function (disabledConfig) {
                                 if (disabledConfig.get('id') === content.value) {
-                                    item.removeConfiguration(disabledConfig);
-                                    toDelete.push(view.deleteModel(disabledConfig));
+                                    toDelete.push(disabledConfig);
                                 }
                             });
                         }
-                        if (item.size() <= 0) {
-                            //if no type configurations, delete the entire source.
-                            view.model.get('collection').removeSource(item);
-                        }
+                    }
+                });
+                if (toDelete.length > 0) {
+                    //remove all selected configurations from the current item
+                    _.each(toDelete, function(cfg) {
+                        view.deleteModel(cfg).then(function() {
+                            item.removeConfiguration(cfg);
+                            if (item.size() <= 0) {
+                                //if no type configurations, delete the entire source.
+                                itemsToRemove.push(item);
+                            }
+                            
+                        });
                     });
                 }
             });
 
-            $.when(toDelete).then(function() {
-                wreqr.vent.trigger('refreshSources');
-                view.$el.modal("hide");
+            _.each(itemsToRemove, function(itm) {
+                view.model.get('collection').removeSource(itm);
             });
+            wreqr.vent.trigger('refreshSources');
+            view.$el.modal("hide");
         },
         deleteModel: function(source) {
             var deferred = $.Deferred();
