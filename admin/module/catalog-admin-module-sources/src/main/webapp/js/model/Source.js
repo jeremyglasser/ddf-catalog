@@ -19,7 +19,7 @@ define(function (require) {
         Service = require('js/model/Service.js'),
         _ = require('underscore');
 
-    require('backbonerelational');
+    require('backboneassociation');
 
     var Source = {};
 
@@ -136,7 +136,7 @@ define(function (require) {
                 this.model.get("value").each(function(service) {
                     if(!_.isEmpty(service.get("configurations"))) {
                         service.get("configurations").each(function(configuration) {
-                            var cfgService = configuration.get('service');
+                            var cfgService = configuration.getService();
                             if(configuration.get('id') && (resModel.isSourceName(configuration.get('fpid')) || 
                                     (cfgService && resModel.isSourceName(cfgService.get('name'))))){
                                 if(configuration.get('fpid').indexOf('_disabled') === -1){
