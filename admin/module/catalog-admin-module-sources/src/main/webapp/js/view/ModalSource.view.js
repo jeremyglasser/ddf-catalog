@@ -137,12 +137,12 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             var disabledConfigs = this.model.get('disabledConfigurations');
             var currentConfig = this.model.get('currentConfiguration');
             if (!_.isUndefined(currentConfig)) {
-                var currentService = currentConfig.getService();
+                var currentService = currentConfig.get('service');
                 configs.add(currentService);
             }
             if (!_.isUndefined(disabledConfigs)) {
                 disabledConfigs.each(function(config) {
-                    configs.add(config.getService());
+                    configs.add(config.get('service'));
                 });
             }
             return configs;
@@ -293,7 +293,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
 
                 var properties = config.get('properties');
                 view.checkName(view.$('.sourceName').find('input').val().trim());
-                view.renderDetails(this.model, config.getService());
+                view.renderDetails(this.model, config.get('service'));
                 view.initRadioButtonUI(properties);
                 view.modelBinder.bind(properties, $boundData, Backbone.ModelBinder.createDefaultBindings($boundData, 'name'));
             }
@@ -309,7 +309,7 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
             } else {
                 if (!_.isUndefined(disabledConfigs)) {
                     config = disabledConfigs.find(function(item) {
-                        var service = item.getService();
+                        var service = item.get('service');
                         if (!_.isUndefined(service) && !_.isNull(service)) {
                             return service.get('id') === id;
                         }

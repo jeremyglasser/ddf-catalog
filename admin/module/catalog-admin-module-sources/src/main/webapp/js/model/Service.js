@@ -50,6 +50,13 @@ define(function (require) {
             }
         ],
 
+        initialize: function(options) {
+            if (options.service) {
+                this.initializeFromService(options.service);
+            } else {
+                this.set('service', this.getService());
+            }
+        },
         /**
          * Collect all the data to save.
          * @param pid The pid id.

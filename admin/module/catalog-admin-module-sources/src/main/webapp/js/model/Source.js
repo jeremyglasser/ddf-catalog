@@ -136,7 +136,7 @@ define(function (require) {
                 this.model.get("value").each(function(service) {
                     if(!_.isEmpty(service.get("configurations"))) {
                         service.get("configurations").each(function(configuration) {
-                            var cfgService = configuration.getService();
+                            var cfgService = configuration.get('service');
                             if(configuration.get('id') && (resModel.isSourceName(configuration.get('fpid')) || 
                                     (cfgService && resModel.isSourceName(cfgService.get('name'))))){
                                 if(configuration.get('fpid').indexOf('_disabled') === -1){
@@ -189,8 +189,7 @@ define(function (require) {
                             (id.indexOf('Source') !== -1 || id.indexOf('Source') !== -1) || 
                             !_.isUndefined(name) && (name.indexOf('Source') !== -1 || name.indexOf('Service') !== -1)) && 
                             !initialModel.hasConfiguration(service)) {
-                        var config = new Service.Configuration();
-                        config.initializeFromService(service);
+                        var config = new Service.Configuration({service: service});
                         config.set('fpid', config.get('fpid') + '_disabled');
                         initialModel.addDisabledConfiguration(config);
                     }
