@@ -142,11 +142,11 @@ define(function (require) {
         },
 
         getServicePid: function(){
-            var model = this;
-            if(model.get('properties') && model.get('properties').get("service.pid")){
-                var pid = model.get('properties').get("service.pid");
-                if(pid){
-                    return pid;
+            var props = this.get('properties');
+            if (props) {
+                var config = props.parents[0];
+                if (config) {
+                    return config.id;
                 }
             }
             return null;
@@ -163,8 +163,8 @@ define(function (require) {
                 model = this,
                 addUrl = [model.configUrl, "add"].join("/");
             //if it has a pid we are editing an existing record
-            if(model.get('properties') && model.get('properties').get("service.pid") || (model.parents.length > 0 && model.parents[0].get('id'))) {
-                var collect = model.collectedData(model.get('properties').get("service.pid") || model.parents[0].get('id'));
+            if(model.parents.length > 0 && model.parents[0].get('id')) {
+                var collect = model.parents[0].get('id');
                 var jData = JSON.stringify(collect);
 
                 return $.ajax({
@@ -224,9 +224,12 @@ define(function (require) {
         },
         destroy: function() {
             var deferred = $.Deferred(),
-                model = this;
-            var deleteUrl = [model.configUrl, "delete", model.get('properties').get("service.pid")].join("/");
+                model = this,
+                deleteUrl = [model.configUrl, "delete", model.id].join("/");
 
+            if (!model.id) {
+                throw "No ID defined for model '" + model.get('name') + "'.";
+            }
             return $.ajax({
                 type: 'GET',
                 url: deleteUrl

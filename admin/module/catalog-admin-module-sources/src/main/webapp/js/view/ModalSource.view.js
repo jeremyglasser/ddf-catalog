@@ -159,14 +159,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
                     view.closeAndUnbind();
                     wreqr.vent.trigger('refreshSources');
                 });
-                if(model.get('enabled')) {
-                    parentModel.get('collection').each(function(config) {
-                        if (config.get('name') === model.get('name')) {
-                            config.set('enabled', false);
-                            config.save(); //TODO these saves need to happen atomically
-                        }
-                    });
-                }
             }
         },
         sourceNameChanged: function(evt) {
