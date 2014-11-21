@@ -225,11 +225,11 @@ function (ich,Marionette,_,$,Q,ModalSource,Service,wreqr,deleteModal,deleteSourc
 
                         var id = currentConfig ? currentConfig.get('id') : null;
                         if (id === content.value) {
-                            toDelete.push(view.removeConfiguration(item, currentConfig));
+                            toDelete.push(view.createDeletePromise(item, currentConfig));
                         } else if (disableConfigs) {
                             disableConfigs.each(function (disabledConfig) {
                                 if (disabledConfig.get('id') === content.value) {
-                                    toDelete.push(view.removeConfiguration(item, disabledConfig));
+                                    toDelete.push(view.createDeletePromise(item, disabledConfig));
                                 }
                             });
                         }
@@ -246,24 +246,29 @@ function (ich,Marionette,_,$,Q,ModalSource,Service,wreqr,deleteModal,deleteSourc
                         if (item.size() <= 0) {
                             //if no type configurations, delete the entire source.
                             view.model.get('collection').removeSource(item);
+                            view.model.get('model').get('value').remove(item)
                         }
                     });
+                    wreqr.vent.trigger('refreshSources');
                     view.$el.modal("hide");
                 });
             }
         },
-        removeConfiguration: function(source, config) {
-            var deferred = Q.defer();
-            config.destroy().success(function() {
-                deferred.resolve({
-                        source: source,
-                        config: config
-                    });
-            }).fail(function() {
-                deferred.reject(new Error("Unable to delete configuration '" + source.get('name') + "'."));
-            });
-            source.removeConfiguration(config);
-            return deferred.promise;
+        createDeletePromise: function(source, config) {
+          var deferred = Q.defer();
+          var serviceModels = this.model.get('model').get('value');
+          config.destroy().success(function(a, b, c) {
+              source.removeConfiguration(config);
+              //sync up the service model so that the refresh updates properly
+              serviceModels.remove(config.getService());
+              deferred.resolve({
+                  source: source,
+                  config: config
+              });
+          }).fail(function() {
+              deferred.reject(new Error("Unable to delete configuration '" + source.get('name') + "'."));
+          });
+          return deferred.promise;
         }
     });
 
