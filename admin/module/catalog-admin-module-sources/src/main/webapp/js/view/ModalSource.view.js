@@ -153,7 +153,6 @@ function (ich,Marionette,Backbone,ConfigurationEdit,Service,Utils,wreqr,_,$,moda
         submitData: function() {
             var view = this;
             var model = view.model.get('editConfig');
-            var parentModel = this.parentModel;
             if (model) {
                 model.save().then(function() {
                     view.closeAndUnbind();

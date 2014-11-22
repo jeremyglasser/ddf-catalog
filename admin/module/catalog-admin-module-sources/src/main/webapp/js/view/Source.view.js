@@ -246,7 +246,7 @@ function (ich,Marionette,_,$,Q,ModalSource,Service,wreqr,deleteModal,deleteSourc
                         if (item.size() <= 0) {
                             //if no type configurations, delete the entire source.
                             view.model.get('collection').removeSource(item);
-                            view.model.get('model').get('value').remove(item)
+                            view.model.get('model').get('value').remove(item);
                         }
                     });
                     wreqr.vent.trigger('refreshSources');
@@ -257,7 +257,7 @@ function (ich,Marionette,_,$,Q,ModalSource,Service,wreqr,deleteModal,deleteSourc
         createDeletePromise: function(source, config) {
           var deferred = Q.defer();
           var serviceModels = this.model.get('model').get('value');
-          config.destroy().success(function(a, b, c) {
+          config.destroy().success(function() {
               source.removeConfiguration(config);
               //sync up the service model so that the refresh updates properly
               serviceModels.remove(config.getService());
